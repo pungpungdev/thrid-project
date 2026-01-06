@@ -3,8 +3,8 @@ import Sidebar from "../components/Sidebar";
 import DefaultTable from "../components/DefaultTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import * as majorService from "../services/majorService";
-import * as facultyService from "../services/facultyService";
+import {getMajors,createMajor,deleteMajor,updateMajor} from "../services/majorService";
+import {getFaculties} from "../services/facultyService";
 import {
   Box,
   Button,
@@ -37,12 +37,12 @@ function MajorPage() {
   const [editId, setEditId] = useState(null);
 
   const fetchMajors = async () => {
-    const res = await majorService.getMajors();
+    const res = await getMajors();
     console.log("Fetched majors:", res.data);
     setMajors(res.data);
   };
   const fetchFaculties = async () => {
-    const res = await facultyService.getFaculties();
+    const res = await getFaculties();
     console.log("Fetched faculties:", res.data);
     setFaculties(res.data);
   };

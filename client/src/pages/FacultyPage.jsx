@@ -3,7 +3,7 @@ import Sidebar from "../components/Sidebar";
 import DefaultTable from "../components/DefaultTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import * as facultyService from "../services/facultyService";
+import {createFaculty,deleteFaculty,getFaculties,updateFaculty} from "../services/facultyService";
 import {
   Box,
   Button,
@@ -29,7 +29,7 @@ export default function FacultyPage() {
   const [editId, setEditId] = useState(null);
 
   const fetchFaculties = async () => {
-    const res = await facultyService.getFaculties();
+    const res = await getFaculties();
     setFaculties(res.data);
   };
 

@@ -3,7 +3,13 @@ import Sidebar from "../components/Sidebar";
 import DefaultTable from "../components/DefaultTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import * as subjectService from "../services/subjectService";
+import {getFaculties} from "../services/facultyService";
+import {
+  createSubject,
+  deleteSubject,
+  getSubjects,
+  updateSubject,
+} from "../services/subjectService";
 import {
   Box,
   Button,
@@ -13,6 +19,10 @@ import {
   DialogActions,
   TextField,
   Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
 } from "@mui/material";
 import { useValidation } from "../hooks/useValidation";
 
@@ -24,6 +34,8 @@ const columns = [
 ];
 
 function SubjectPage() {
+  const [faculties, setFaculties] = useState([]);
+  const [majors, setMajors] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
@@ -33,13 +45,20 @@ function SubjectPage() {
   });
   const [editId, setEditId] = useState(null);
 
+  const fetchFaculties = async () => {
+      const res = await getFaculties();
+      console.log("Fetched faculties:", res.data);
+      setFaculties(res.data);
+    };
+
   const fetchSubjects = async () => {
-    const res = await subjectService.getSubjects();
+    const res = await getSubjects();
     setSubjects(res.data);
   };
 
   useEffect(() => {
     fetchSubjects();
+    fetchFaculties();
   }, []);
 
   const handleOpen = (subject = null) => {
@@ -48,6 +67,10 @@ function SubjectPage() {
         subId: subject.subId || "",
         subName: subject.subName || "",
         subUnit: subject.subUnit || "",
+        facultiesId: subject.facultiesId || "",
+        majorId: subject.majorId || "",
+        subGroupId: subject.subGroupId || "",
+        actives: true,
       });
       setEditId(subject.id);
     } else {
@@ -55,6 +78,10 @@ function SubjectPage() {
         subId: "",
         subName: "",
         subUnit: "",
+        facultiesId: "",
+        majorId: "",
+        subGroupId: "",
+        actives: true,
       });
       setEditId(null);
     }
@@ -68,21 +95,21 @@ function SubjectPage() {
 
   const { validate, resetErrors, errors } = useValidation();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     resetErrors();
     if (!validate(form)) return;
 
     if (editId) {
-      subjectService.updateSubject(editId, form);
+      await updateSubject(editId, form);
     } else {
-      subjectService.createSubject(form);
+      await createSubject(form);
     }
     fetchSubjects();
     handleClose();
   };
 
   const handleDelete = async (id) => {
-    await subjectService.deleteSubject(id);
+    await deleteSubject(id);
     fetchSubjects();
   };
 
@@ -169,6 +196,23 @@ function SubjectPage() {
                 onChange={handleChange}
                 fullWidth
               />
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="faculty-label">Faculty</InputLabel>
+                <Select
+                  labelId="faculty-label"
+                  id="facultiesId"
+                  label="Faculty"
+                  name="facultiesId"
+                  value={form.facultiesId}
+                  onChange={handleChange}
+                >
+                  {faculties.map((faculty) => (
+                    <MenuItem key={faculty.id} value={faculty.id}>
+                      {faculty.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
             </Box>
           </DialogContent>
           <DialogActions>

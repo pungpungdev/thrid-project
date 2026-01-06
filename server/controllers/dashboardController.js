@@ -8,7 +8,10 @@ exports.getUserStats = async (req, res) => {
     const teacherCount = await prisma.user.count({
       where: { role: "Teacher" },
     });
-    res.json({ Admin: adminCount, Teacher: teacherCount });
+    const committeeCount = await prisma.user.count({
+      where: { role: "Committee" },
+    });
+    res.json({ Admin: adminCount, Teacher: teacherCount, Committee: committeeCount });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

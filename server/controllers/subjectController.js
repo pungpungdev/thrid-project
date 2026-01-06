@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 exports.createSubject = async (req, res) => {
   try {
     const subject = await prisma.subject.create({ data: req.body });
-    res.json(subject);
+    res.status(201).json(subject);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

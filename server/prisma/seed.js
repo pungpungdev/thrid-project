@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
@@ -60,6 +62,38 @@ async function seedDatabase() {
     },
   });
 
+  // Create User (Teacher)
+  const teacher = await prisma.user.create({
+    data: {
+      username: "teacher",
+      password: await bcrypt.hash("teacher123", 10),
+      firstname: "System",
+      lastname: "Teacher",
+      telephone: "0812345678",
+      email: "teacher@example.com",
+      faculties_id: faculty.id,
+      majors_id: major.id,
+      role: "Teacher",
+      actives: true,
+    },
+  });
+
+  // Create User (Committee)
+  const committee = await prisma.user.create({
+    data: {
+      username: "committee",
+      password: await bcrypt.hash("committee123", 10),
+      firstname: "System",
+      lastname: "Committee",
+      telephone: "0812345678",
+      email: "committee@example.com",
+      faculties_id: faculty.id,
+      majors_id: major.id,
+      role: "Committee",
+      actives: true,
+    },
+  });
+
   // Create SubGroups
   const subGroupsData = [
     { codeSubject: "EXP", nameSubject: "กลุ่มวิชาฝึกประสบการณ์วิชาชีพ" },
@@ -76,49 +110,49 @@ async function seedDatabase() {
   // Create Subjects
   const subjectsData = [
     {
-      id: "SUB001",
+      id: 1,
       subId: "30202-8001",
       subName: "ฝึกงาน",
       subUnit: 4,
       groupCode: "EXP",
     },
     {
-      id: "SUB002",
+      id: 2,
       subId: "30204-2005",
       subName: "การเขียนโปรแกรมคอมพิวเตอร์",
       subUnit: 3,
       groupCode: "CS",
     },
     {
-      id: "SUB003",
+      id: 3,
       subId: "30204-2102",
       subName: "การวิเคราะห์เชิงธุรกิจดิจิทัล",
       subUnit: 3,
       groupCode: "BUS",
     },
     {
-      id: "SUB004",
+      id: 4,
       subId: "30204-2301",
       subName: "การออกแบบประสบการณ์ผู้ใช้",
       subUnit: 3,
       groupCode: "BUS",
     },
     {
-      id: "SUB005",
+      id: 5,
       subId: "30204-2401",
       subName: "การออกแบบและพัฒนาเว็บไซต์",
       subUnit: 3,
       groupCode: "CS",
     },
     {
-      id: "SUB006",
+      id: 6,
       subId: "30204-2002",
       subName: "ระบบฐานข้อมูลและคลังข้อมูล",
       subUnit: 3,
       groupCode: "CS",
     },
     {
-      id: "SUB007",
+      id: 7,
       subId: "30204-2104",
       subName: "หลักการพัฒนาโปรแกรมประยุกต์ธุรกิจดิจิทัล",
       subUnit: 3,

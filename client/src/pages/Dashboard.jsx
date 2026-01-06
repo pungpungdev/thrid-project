@@ -14,7 +14,7 @@ import * as dashboardService from "../services/dashboardService";
 
 function Dashboard() {
   const [stats, setStats] = useState({
-    users: { Admin: 0, Teacher: 0 },
+    users: { Admin: 0, Teacher: 0, Committee: 0 },
     students: { Active: 0, Inactive: 0 },
   });
 
@@ -35,6 +35,7 @@ function Dashboard() {
   const chartData = [
     { name: "Admin", count: stats.users.Admin },
     { name: "Teacher", count: stats.users.Teacher },
+    { name: "Committee", count: stats.users.Committee },
     { name: "Student (Active)", count: stats.students.Active },
     { name: "Student (Inactive)", count: stats.students.Inactive },
   ];

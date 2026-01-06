@@ -111,7 +111,7 @@ function CoursePage() {
             annualCourseService.createAnnualCourseSubject({
               annualCourseId: res.data.id,
               subjectId,
-              type: "BASE",
+              /*type: "BASE",*/
             })
           )
         );
