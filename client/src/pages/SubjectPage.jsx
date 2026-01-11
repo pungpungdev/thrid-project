@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
+import CustomAlert from "../components/CustomAlert";
 import Sidebar from "../components/Sidebar";
 import DefaultTable from "../components/DefaultTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { getFaculties } from "../services/facultyService";
 import { getMajorsByFacultyId } from "../services/majorService";
-import {getSubGroups} from "../services/subGroupService";
+import { getSubGroups } from "../services/subGroupService";
 import {
   createSubject,
   deleteSubject,
@@ -39,7 +40,7 @@ const columns = [
 function SubjectPage() {
   const [faculties, setFaculties] = useState([]);
   const [majors, setMajors] = useState([]);
-  const [subGroups, setSubGroups] = useState([]); 
+  const [subGroups, setSubGroups] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
@@ -52,6 +53,11 @@ function SubjectPage() {
     actives: true,
   });
   const [editId, setEditId] = useState(null);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const fetchFaculties = async () => {
     const res = await getFaculties();
@@ -69,7 +75,7 @@ function SubjectPage() {
     const res = await getSubGroups();
     console.log("Fetched sub-groups:", res.data);
     setSubGroups(res.data);
-  }
+  };
 
   const fetchSubjects = async () => {
     const res = await getSubjects();
@@ -84,6 +90,7 @@ function SubjectPage() {
   }, []);
 
   const handleOpen = (subject = null) => {
+    resetErrors();
     if (subject) {
       fetchMajorsByFacultyId(subject.facultiesId || []);
       setForm({
@@ -125,24 +132,62 @@ function SubjectPage() {
     }
   };
 
-  const { validate, resetErrors, errors } = useValidation();
+  const requiredFields = [
+    "subId",
+    "subName",
+    "subUnit",
+    "facultiesId",
+    "majorId",
+    "subGroupId",
+  ];
+  const { validate, resetErrors, errors } = useValidation(requiredFields);
 
   const handleSubmit = async () => {
     resetErrors();
     if (!validate(form)) return;
-
-    if (editId) {
-      await updateSubject(editId, form);
-    } else {
-      await createSubject(form);
+    try {
+      if (editId) {
+        await updateSubject(editId, form);
+        setAlert({
+          open: true,
+          message: "Subject updated successfully!",
+          severity: "success",
+        });
+      } else {
+        await createSubject(form);
+        setAlert({
+          open: true,
+          message: "Subject created successfully!",
+          severity: "success",
+        });
+      }
+      fetchSubjects();
+      handleClose();
+    } catch (error) {
+      setAlert({
+        open: true,
+        message: error.message || "Error occurred",
+        severity: "error",
+      });
     }
-    fetchSubjects();
-    handleClose();
   };
 
   const handleDelete = async (id) => {
-    await deleteSubject(id);
-    fetchSubjects();
+    try {
+      await deleteSubject(id);
+      fetchSubjects();
+      setAlert({
+        open: true,
+        message: "Subject deleted successfully!",
+        severity: "success",
+      });
+    } catch (error) {
+      setAlert({
+        open: true,
+        message: error.message || "Error occurred",
+        severity: "error",
+      });
+    }
   };
 
   const rows = subjects.map((subject) => ({
@@ -169,128 +214,146 @@ function SubjectPage() {
   }));
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            mb: 2,
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="h5" fontWeight={700}>
-            วิชา
-          </Typography>
-          <Button variant="contained" onClick={() => handleOpen()}>
-            Add Subject
-          </Button>
-        </Box>
-
-        <DefaultTable columns={columns} rows={rows} />
-
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{editId ? "Edit Subject" : "Add Subject"}</DialogTitle>
-          <DialogContent>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                minWidth: 400,
-                py: 1,
-              }}
-            >
-              <TextField
-                margin="dense"
-                label="Subject ID"
-                name="subId"
-                value={form.subId}
-                onChange={handleChange}
-                error={!!errors.subId}
-                helperText={errors.subId}
-                fullWidth
-              />
-              <TextField
-                margin="dense"
-                label="Subject Name"
-                name="subName"
-                value={form.subName}
-                onChange={handleChange}
-                fullWidth
-              />
-              <TextField
-                type="number"
-                margin="dense"
-                label="Unit"
-                name="subUnit"
-                value={form.subUnit}
-                onChange={handleChange}
-                fullWidth
-              />
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="faculty-label">Faculty</InputLabel>
-                <Select
-                  labelId="faculty-label"
-                  id="facultiesId"
-                  label="Faculty"
-                  name="facultiesId"
-                  value={form.facultiesId}
-                  onChange={handleChange}
-                >
-                  {faculties.map((faculty) => (
-                    <MenuItem key={faculty.id} value={faculty.id}>
-                      {faculty.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="major-label">Major</InputLabel>
-                <Select
-                  labelId="major-label"
-                  id="majorId"
-                  label="Major"
-                  name="majorId"
-                  value={form.majorId}
-                  onChange={handleChange}
-                >
-                  {majors.map((major) => (
-                    <MenuItem key={major.id} value={major.id}>
-                      {major.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth margin="dense">
-                <InputLabel id="sub-group-label">Sub Group</InputLabel>
-                <Select
-                  labelId="sub-group-label"
-                  id="subGroupId"
-                  label="Sub Group"
-                  name="subGroupId"
-                  value={form.subGroupId}
-                  onChange={handleChange}
-                >
-                  {subGroups.map((subGroup) => (
-                    <MenuItem key={subGroup.id} value={subGroup.id}>
-                      {subGroup.nameSubject}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSubmit} variant="contained">
-              {editId ? "Update" : "Create"}
+    <>
+      <Box sx={{ display: "flex" }}>
+        <Sidebar />
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant="h5" fontWeight={700}>
+              วิชา
+            </Typography>
+            <Button variant="contained" onClick={() => handleOpen()}>
+              Add Subject
             </Button>
-          </DialogActions>
-        </Dialog>
+          </Box>
+
+          <DefaultTable columns={columns} rows={rows} />
+
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>{editId ? "Edit Subject" : "Add Subject"}</DialogTitle>
+            <DialogContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  minWidth: 400,
+                  py: 1,
+                }}
+              >
+                <TextField
+                  margin="dense"
+                  label="Subject ID"
+                  name="subId"
+                  value={form.subId}
+                  onChange={handleChange}
+                  error={!!errors.subId}
+                  helperText={errors.subId}
+                  fullWidth
+                />
+                <TextField
+                  margin="dense"
+                  label="Subject Name"
+                  name="subName"
+                  value={form.subName}
+                  onChange={handleChange}
+                  error={!!errors.subName}
+                  helperText={errors.subName}
+                  fullWidth
+                />
+                <TextField
+                  type="number"
+                  margin="dense"
+                  label="Unit"
+                  name="subUnit"
+                  value={form.subUnit}
+                  onChange={handleChange}
+                  error={!!errors.subUnit}
+                  helperText={errors.subUnit}
+                  fullWidth
+                />
+                <FormControl fullWidth margin="dense">
+                  <InputLabel id="faculty-label">Faculty</InputLabel>
+                  <Select
+                    labelId="faculty-label"
+                    id="facultiesId"
+                    label="Faculty"
+                    name="facultiesId"
+                    value={form.facultiesId}
+                    onChange={handleChange}
+                    error={!!errors.facultiesId}
+                    helperText={errors.facultiesId}
+                  >
+                    {faculties.map((faculty) => (
+                      <MenuItem key={faculty.id} value={faculty.id}>
+                        {faculty.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth margin="dense">
+                  <InputLabel id="major-label">Major</InputLabel>
+                  <Select
+                    labelId="major-label"
+                    id="majorId"
+                    label="Major"
+                    name="majorId"
+                    value={form.majorId}
+                    onChange={handleChange}
+                    error={!!errors.majorId}
+                    helperText={errors.majorId}
+                  >
+                    {majors.map((major) => (
+                      <MenuItem key={major.id} value={major.id}>
+                        {major.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth margin="dense">
+                  <InputLabel id="sub-group-label">Sub Group</InputLabel>
+                  <Select
+                    labelId="sub-group-label"
+                    id="subGroupId"
+                    label="Sub Group"
+                    name="subGroupId"
+                    value={form.subGroupId}
+                    onChange={handleChange}
+                    error={!!errors.subGroupId}
+                    helperText={errors.subGroupId}
+                  >
+                    {subGroups.map((subGroup) => (
+                      <MenuItem key={subGroup.id} value={subGroup.id}>
+                        {subGroup.nameSubject}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleSubmit} variant="contained">
+                {editId ? "Update" : "Create"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
       </Box>
-    </Box>
+      <CustomAlert
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        severity={alert.severity}
+        message={alert.message}
+      />
+    </>
   );
 }
 

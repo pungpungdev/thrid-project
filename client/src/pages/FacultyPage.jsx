@@ -20,6 +20,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useValidation } from "../hooks/useValidation";
 
 const columns = [
   { field: "name", headerName: "คณะ" },
@@ -48,7 +49,11 @@ export default function FacultyPage() {
     fetchFaculties();
   }, []);
 
+  const requiredFields = ["name"];
+  const { validate, resetErrors, errors } = useValidation(requiredFields);
+
   const handleOpen = (faculty = null) => {
+    resetErrors();
     if (faculty) {
       setForm({
         name: faculty.name || "",
@@ -69,6 +74,8 @@ export default function FacultyPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async () => {
+    resetErrors();
+    if (!validate(form)) return;
     try {
       if (editId) {
         await updateFaculty(editId, form);
@@ -97,15 +104,15 @@ export default function FacultyPage() {
   };
 
   const handleDelete = async (id) => {
-    try{
+    try {
       await deleteFaculty(id);
       fetchFaculties();
       setAlert({
-          open: true,
-          message: "Faculty deleted successfully!",
-          severity: "success",
-        });
-    }catch(error){
+        open: true,
+        message: "Faculty deleted successfully!",
+        severity: "success",
+      });
+    } catch (error) {
       setAlert({
         open: true,
         message: error.message || "Error occurred",
@@ -139,64 +146,66 @@ export default function FacultyPage() {
 
   return (
     <>
-    <Box sx={{ display: "flex" }}>
-      <Sidebar />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            mb: 2,
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography variant="h5" fontWeight={500}>
-            คณะ
-          </Typography>
-          <Button variant="contained" onClick={() => handleOpen()}>
-            Add Faculty
-          </Button>
-        </Box>
-
-        <DefaultTable columns={columns} rows={rows} />
-
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{editId ? "Edit Faculty" : "Add Faculty"}</DialogTitle>
-          <DialogContent>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-                minWidth: 400,
-                py: 1,
-              }}
-            >
-              <TextField
-                margin="dense"
-                label="Faculty Name"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                fullWidth
-              />
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSubmit} variant="contained">
-              {editId ? "Update" : "Create"}
+      <Box sx={{ display: "flex" }}>
+        <Sidebar />
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mb: 2,
+              justifyContent: "space-between",
+            }}
+          >
+            <Typography variant="h5" fontWeight={500}>
+              คณะ
+            </Typography>
+            <Button variant="contained" onClick={() => handleOpen()}>
+              Add Faculty
             </Button>
-          </DialogActions>
-        </Dialog>
+          </Box>
+
+          <DefaultTable columns={columns} rows={rows} />
+
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>{editId ? "Edit Faculty" : "Add Faculty"}</DialogTitle>
+            <DialogContent>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                  minWidth: 400,
+                  py: 1,
+                }}
+              >
+                <TextField
+                  margin="dense"
+                  label="Faculty Name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  error={!!errors.name}
+                  helperText={errors.name}
+                  fullWidth
+                />
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleSubmit} variant="contained">
+                {editId ? "Update" : "Create"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </Box>
       </Box>
-    </Box>
-    <CustomAlert
-            open={alert.open}
-            onClose={() => setAlert({ ...alert, open: false })}
-            severity={alert.severity}
-            message={alert.message}
-          />
+      <CustomAlert
+        open={alert.open}
+        onClose={() => setAlert({ ...alert, open: false })}
+        severity={alert.severity}
+        message={alert.message}
+      />
     </>
   );
 }
