@@ -4,7 +4,7 @@ const { sendWelcomeMail } = require("../controllers/mailController");
 
 /**
  * @swagger
- * /mail/send-welcome:
+ * /api/mail/send-welcome:
  *   post:
  *     summary: Send a welcome email to a new user
  *     tags:

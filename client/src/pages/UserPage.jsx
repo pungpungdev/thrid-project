@@ -171,8 +171,21 @@ function UserPage() {
   };
 
   const handleDelete = async (id) => {
-    await deleteUser(id);
-    fetchUsers();
+    try {
+      await deleteUser(id);
+      fetchUsers();
+      setAlert({
+        open: true,
+        message: "User deleted successfully!",
+        severity: "success",
+      });
+    } catch (error) {
+      setAlert({
+        open: true,
+        message: error.message || "Error occurred",
+        severity: "error",
+      });
+    }
   };
 
   const rows = users.map((user) => ({

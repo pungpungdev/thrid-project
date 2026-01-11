@@ -14,6 +14,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const mailRoutes = require("./routes/mailRoutes");
 const docRoutes = require("./routes/docRoutes");
 const summaryRoutes = require("./routes/summaryRoutes");
+const subGroupRoutes = require("./routes/subGroupRoutes");
 
 app.use(express.json());
 app.use(
@@ -40,17 +41,18 @@ app.get("/", (req, res) => {
 const setupSwagger = require("./swaggerConfig");
 setupSwagger(app);
 
-app.use("/students", studentRoutes);
+app.use("/api/students", studentRoutes);
 app.use("/api/annual-courses", annualCourseRoutes);
-app.use("/faculties", facultyRoutes);
-app.use("/users", userRoutes);
-app.use("/subjects", subjectRoutes);
-app.use("/majors", majorRoutes);
-app.use("/admin", adminRoutes);
+app.use("/api/faculties", facultyRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/subjects", subjectRoutes);
+app.use("/api/majors", majorRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-app.use("/mail", mailRoutes);
+app.use("/api/mail", mailRoutes);
 app.use("/api/doc", docRoutes);
 app.use("/api/summary", summaryRoutes);
+app.use("/api/sub-groups", subGroupRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

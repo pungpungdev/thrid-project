@@ -3,7 +3,9 @@ import Sidebar from "../components/Sidebar";
 import DefaultTable from "../components/DefaultTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import {getFaculties} from "../services/facultyService";
+import { getFaculties } from "../services/facultyService";
+import { getMajorsByFacultyId } from "../services/majorService";
+import {getSubGroups} from "../services/subGroupService";
 import {
   createSubject,
   deleteSubject,
@@ -18,11 +20,12 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Input,
   Typography,
   FormControl,
   InputLabel,
   Select,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import { useValidation } from "../hooks/useValidation";
 
@@ -36,33 +39,53 @@ const columns = [
 function SubjectPage() {
   const [faculties, setFaculties] = useState([]);
   const [majors, setMajors] = useState([]);
+  const [subGroups, setSubGroups] = useState([]); 
   const [subjects, setSubjects] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     subId: "",
     subName: "",
     subUnit: "",
+    facultiesId: "",
+    majorId: "",
+    subGroupId: "",
+    actives: true,
   });
   const [editId, setEditId] = useState(null);
 
   const fetchFaculties = async () => {
-      const res = await getFaculties();
-      console.log("Fetched faculties:", res.data);
-      setFaculties(res.data);
-    };
+    const res = await getFaculties();
+    console.log("Fetched faculties:", res.data);
+    setFaculties(res.data);
+  };
+
+  const fetchMajorsByFacultyId = async (facultyId) => {
+    const res = await getMajorsByFacultyId(facultyId);
+    console.log("Fetched majors:", res.data);
+    setMajors(res.data);
+  };
+
+  const fetchSubGroups = async () => {
+    const res = await getSubGroups();
+    console.log("Fetched sub-groups:", res.data);
+    setSubGroups(res.data);
+  }
 
   const fetchSubjects = async () => {
     const res = await getSubjects();
+    console.log("Fetched subjects:", res.data);
     setSubjects(res.data);
   };
 
   useEffect(() => {
     fetchSubjects();
     fetchFaculties();
+    fetchSubGroups();
   }, []);
 
   const handleOpen = (subject = null) => {
     if (subject) {
+      fetchMajorsByFacultyId(subject.facultiesId || []);
       setForm({
         subId: subject.subId || "",
         subName: subject.subName || "",
@@ -74,6 +97,7 @@ function SubjectPage() {
       });
       setEditId(subject.id);
     } else {
+      setMajors([]);
       setForm({
         subId: "",
         subName: "",
@@ -90,8 +114,16 @@ function SubjectPage() {
 
   const handleClose = () => setOpen(false);
 
-  const handleChange = (e) =>
+  const handleChange = (e) => {
+    console.log(e.target.name, e.target.value);
+    if (e.target.name === "facultiesId") {
+      fetchMajorsByFacultyId(e.target.value);
+    }
     setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "subUnit") {
+      setForm({ ...form, [e.target.name]: Number(e.target.value) });
+    }
+  };
 
   const { validate, resetErrors, errors } = useValidation();
 
@@ -189,6 +221,7 @@ function SubjectPage() {
                 fullWidth
               />
               <TextField
+                type="number"
                 margin="dense"
                 label="Unit"
                 name="subUnit"
@@ -209,6 +242,40 @@ function SubjectPage() {
                   {faculties.map((faculty) => (
                     <MenuItem key={faculty.id} value={faculty.id}>
                       {faculty.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="major-label">Major</InputLabel>
+                <Select
+                  labelId="major-label"
+                  id="majorId"
+                  label="Major"
+                  name="majorId"
+                  value={form.majorId}
+                  onChange={handleChange}
+                >
+                  {majors.map((major) => (
+                    <MenuItem key={major.id} value={major.id}>
+                      {major.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="sub-group-label">Sub Group</InputLabel>
+                <Select
+                  labelId="sub-group-label"
+                  id="subGroupId"
+                  label="Sub Group"
+                  name="subGroupId"
+                  value={form.subGroupId}
+                  onChange={handleChange}
+                >
+                  {subGroups.map((subGroup) => (
+                    <MenuItem key={subGroup.id} value={subGroup.id}>
+                      {subGroup.nameSubject}
                     </MenuItem>
                   ))}
                 </Select>

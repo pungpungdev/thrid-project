@@ -11,7 +11,7 @@ const studentController = require('../controllers/studentController');
 
 /**
  * @swagger
- * /students:
+ * /api/students:
  *   get:
  *     summary: Get all students
  *     tags: [Students]
@@ -40,7 +40,7 @@ router.get('/', studentController.getStudents);
 
 /**
  * @swagger
- * /students/{id}:
+ * /api/students/{id}:
  *   get:
  *     summary: Get a student by ID
  *     tags: [Students]
@@ -60,7 +60,7 @@ router.get('/:id', studentController.getStudentById);
 
 /**
  * @swagger
- * /students:
+ * /api/students:
  *   post:
  *     summary: Create a new student
  *     tags: [Students]
@@ -103,7 +103,7 @@ router.post('/', studentController.createStudent);
 
 /**
  * @swagger
- * /students/{id}:
+ * /api/students/{id}:
  *   put:
  *     summary: Update a student by ID
  *     tags: [Students]
@@ -138,7 +138,7 @@ router.put('/:id', studentController.updateStudent);
 
 /**
  * @swagger
- * /students/{id}:
+ * /api/students/{id}:
  *   delete:
  *     summary: Deactivate (soft delete) a student by ID
  *     tags: [Students]

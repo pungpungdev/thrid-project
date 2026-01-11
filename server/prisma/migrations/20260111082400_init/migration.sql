@@ -61,7 +61,7 @@ CREATE TABLE `User` (
 
 -- CreateTable
 CREATE TABLE `Subject` (
-    `id` VARCHAR(191) NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `facultiesId` INTEGER NOT NULL,
     `subId` VARCHAR(15) NOT NULL,
     `subName` VARCHAR(45) NOT NULL,
@@ -95,6 +95,7 @@ CREATE TABLE `SubGroup` (
     `codeSubject` VARCHAR(191) NOT NULL DEFAULT '',
     `nameSubject` VARCHAR(191) NOT NULL DEFAULT '',
     `description` VARCHAR(191) NULL DEFAULT '',
+    `unit` DOUBLE NOT NULL DEFAULT 0,
     `actives` BOOLEAN NOT NULL DEFAULT true,
 
     PRIMARY KEY (`id`)
@@ -104,7 +105,7 @@ CREATE TABLE `SubGroup` (
 CREATE TABLE `AnnualCourseSubject` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `annualCourseId` INTEGER NOT NULL,
-    `subjectId` VARCHAR(191) NOT NULL,
+    `subjectId` INTEGER NOT NULL,
 
     UNIQUE INDEX `AnnualCourseSubject_annualCourseId_subjectId_key`(`annualCourseId`, `subjectId`),
     PRIMARY KEY (`id`)
@@ -126,7 +127,7 @@ CREATE TABLE `StudentTransfer` (
 CREATE TABLE `StudentTranscriptGrade` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `studentTransfer_id` INTEGER NOT NULL,
-    `subjectId` VARCHAR(191) NOT NULL,
+    `subjectId` INTEGER NOT NULL,
     `grade` DOUBLE NOT NULL,
 
     INDEX `StudentTranscriptGrade_studentTransfer_id_idx`(`studentTransfer_id`),

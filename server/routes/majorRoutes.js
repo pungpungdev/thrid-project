@@ -11,7 +11,7 @@ const majorController = require("../controllers/majorController");
 
 /**
  * @swagger
- * /majors:
+ * /api/majors:
  *   get:
  *     summary: Get all majors
  *     tags: [Majors]
@@ -36,7 +36,7 @@ router.get("/", majorController.getMajors);
 
 /**
  * @swagger
- * /majors/{id}:
+ * /api/majors/{id}:
  *   get:
  *     summary: Get a major by ID
  *     tags: [Majors]
@@ -68,7 +68,7 @@ router.get("/:id", majorController.getMajorById);
 
 /**
  * @swagger
- * /majors:
+ * /api/majors:
  *   post:
  *     summary: Create a new major
  *     tags: [Majors]
@@ -96,7 +96,7 @@ router.post("/", majorController.createMajor);
 
 /**
  * @swagger
- * /majors/{id}:
+ * /api/majors/{id}:
  *   put:
  *     summary: Update a major by ID
  *     tags: [Majors]
@@ -128,7 +128,7 @@ router.put("/:id", majorController.updateMajor);
 
 /**
  * @swagger
- * /majors/{id}:
+ * /api/majors/{id}:
  *   delete:
  *     summary: Delete a major by ID
  *     tags: [Majors]

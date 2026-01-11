@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
+import CustomAlert from "../components/CustomAlert";
 import Sidebar from "../components/Sidebar";
 import DefaultTable from "../components/DefaultTable";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import {createFaculty,deleteFaculty,getFaculties,updateFaculty} from "../services/facultyService";
+import {
+  createFaculty,
+  deleteFaculty,
+  getFaculties,
+  updateFaculty,
+} from "../services/facultyService";
 import {
   Box,
   Button,
@@ -27,6 +33,11 @@ export default function FacultyPage() {
     name: "",
   });
   const [editId, setEditId] = useState(null);
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const fetchFaculties = async () => {
     const res = await getFaculties();
@@ -58,18 +69,49 @@ export default function FacultyPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async () => {
-    if (editId) {
-      await updateFaculty(editId, form);
-    } else {
-      await createFaculty(form);
+    try {
+      if (editId) {
+        await updateFaculty(editId, form);
+        setAlert({
+          open: true,
+          message: "Faculty updated successfully!",
+          severity: "success",
+        });
+      } else {
+        await createFaculty(form);
+        setAlert({
+          open: true,
+          message: "Faculty created successfully!",
+          severity: "success",
+        });
+      }
+      fetchFaculties();
+      handleClose();
+    } catch (error) {
+      setAlert({
+        open: true,
+        message: error.message || "Error occurred",
+        severity: "error",
+      });
     }
-    fetchFaculties();
-    handleClose();
   };
 
   const handleDelete = async (id) => {
-    await deleteFaculty(id);
-    fetchFaculties();
+    try{
+      await deleteFaculty(id);
+      fetchFaculties();
+      setAlert({
+          open: true,
+          message: "Faculty deleted successfully!",
+          severity: "success",
+        });
+    }catch(error){
+      setAlert({
+        open: true,
+        message: error.message || "Error occurred",
+        severity: "error",
+      });
+    }
   };
 
   const rows = faculties.map((faculty) => ({
@@ -96,6 +138,7 @@ export default function FacultyPage() {
   }));
 
   return (
+    <>
     <Box sx={{ display: "flex" }}>
       <Sidebar />
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
@@ -148,5 +191,12 @@ export default function FacultyPage() {
         </Dialog>
       </Box>
     </Box>
+    <CustomAlert
+            open={alert.open}
+            onClose={() => setAlert({ ...alert, open: false })}
+            severity={alert.severity}
+            message={alert.message}
+          />
+    </>
   );
 }

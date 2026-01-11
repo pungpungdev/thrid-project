@@ -4,7 +4,7 @@ const adminController = require("../controllers/adminController");
 
 /**
  * @swagger
- * /admin/login:
+ * /api/admin/login:
  *   post:
  *     summary: Login user
  *     tags: [Admin]
@@ -41,7 +41,7 @@ router.post("/login", adminController.login);
 
 /**
  * @swagger
- * /admin/logout:
+ * /api/admin/logout:
  *   post:
  *     summary: Logout user
  *     tags: [Admin]
@@ -60,7 +60,7 @@ router.post("/logout", adminController.logout);
 
 /**
  * @swagger
- * /admin/profile:
+ * /api/admin/profile:
  *   get:
  *     summary: Get current logged-in user (protected)
  *     tags: [Admin]

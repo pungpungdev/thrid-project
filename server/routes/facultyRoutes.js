@@ -11,7 +11,7 @@ const facultyController = require('../controllers/facultyController');
 
 /**
  * @swagger
- * /faculties:
+ * /api/faculties:
  *   get:
  *     summary: Get all faculties
  *     tags: [Faculties]
@@ -34,7 +34,7 @@ router.get('/', facultyController.getFaculties);
 
 /**
  * @swagger
- * /faculties/{id}:
+ * /api/faculties/{id}:
  *   get:
  *     summary: Get a faculty by ID
  *     tags: [Faculties]
@@ -64,7 +64,7 @@ router.get('/:id', facultyController.getFacultyById);
 
 /**
  * @swagger
- * /faculties:
+ * /api/faculties:
  *   post:
  *     summary: Create a new faculty
  *     tags: [Faculties]
@@ -89,7 +89,7 @@ router.post('/', facultyController.createFaculty);
 
 /**
  * @swagger
- * /faculties/{id}:
+ * /api/faculties/{id}:
  *   put:
  *     summary: Update a faculty by ID
  *     tags: [Faculties]
@@ -119,7 +119,7 @@ router.put('/:id', facultyController.updateFaculty);
 
 /**
  * @swagger
- * /faculties/{id}:
+ * /api/faculties/{id}:
  *   delete:
  *     summary: Delete a faculty by ID
  *     tags: [Faculties]

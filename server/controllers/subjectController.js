@@ -3,6 +3,7 @@ const prisma = new PrismaClient();
 
 exports.createSubject = async (req, res) => {
   try {
+    console.log("Creating subject with data:", req.body);
     const subject = await prisma.subject.create({ data: req.body });
     res.status(201).json(subject);
   } catch (error) {
@@ -22,7 +23,7 @@ exports.getAllSubjects = async (req, res) => {
 exports.getSubjectById = async (req, res) => {
   try {
     const subject = await prisma.subject.findUnique({
-      where: { id: req.params.id },
+      where: { id: Number(req.params.id) },
     });
     if (!subject) return res.status(404).json({ error: 'Subject not found' });
     res.json(subject);
@@ -34,7 +35,7 @@ exports.getSubjectById = async (req, res) => {
 exports.updateSubject = async (req, res) => {
   try {
     const updated = await prisma.subject.update({
-      where: { id: req.params.id },
+      where: { id: Number(req.params.id) },
       data: req.body,
     });
     res.json(updated);
@@ -46,7 +47,7 @@ exports.updateSubject = async (req, res) => {
 exports.deleteSubject = async (req, res) => {
   try {
     await prisma.subject.update({
-      where: { id: req.params.id },
+      where: { id: Number(req.params.id) },
       data: { actives: true },
     });
     res.json({ message: 'Subject soft deleted' });
