@@ -92,7 +92,7 @@ function SubjectPage() {
   const handleOpen = (subject = null) => {
     resetErrors();
     if (subject) {
-      fetchMajorsByFacultyId(subject.facultiesId || []);
+      fetchMajorsByFacultyId(subject.facultiesId);
       setForm({
         subId: subject.subId || "",
         subName: subject.subName || "",
@@ -125,10 +125,11 @@ function SubjectPage() {
     console.log(e.target.name, e.target.value);
     if (e.target.name === "facultiesId") {
       fetchMajorsByFacultyId(e.target.value);
-    }
-    setForm({ ...form, [e.target.name]: e.target.value });
-    if (e.target.name === "subUnit") {
+      setForm({ ...form, [e.target.name]: e.target.value, majorId: "" });
+    } else if (e.target.name === "subUnit") {
       setForm({ ...form, [e.target.name]: Number(e.target.value) });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
     }
   };
 

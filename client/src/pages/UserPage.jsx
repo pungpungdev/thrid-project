@@ -11,7 +11,7 @@ import {
   deleteUser,
 } from "../services/userService";
 import { getFaculties } from "../services/facultyService";
-import { getMajors } from "../services/majorService";
+import { getMajorsByFacultyId } from "../services/majorService";
 import {
   Box,
   Button,
@@ -25,9 +25,11 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
+  Autocomplete,
   Chip,
 } from "@mui/material";
 import { USER_ROLES } from "../shares/roles";
+import { useValidation } from "../hooks/useValidation";
 
 const columns = [
   { field: "username", headerName: "ชื่อผู้ใช้" },
@@ -74,8 +76,8 @@ function UserPage() {
     telephone: "",
     email: "",
     role: "User",
-    faculties_id: "",
-    majors_id: "",
+    faculties_id: null,
+    majors_id: null,
   });
   const [editId, setEditId] = useState(null);
 
@@ -94,20 +96,34 @@ function UserPage() {
     setUsers(res.data);
   };
 
-  // Fetch faculties and majors on open dialog
-  const fetchFacultiesAndMajors = async () => {
-    const [facRes, majRes] = await Promise.all([getFaculties(), getMajors()]);
-    setFaculties(facRes.data);
-    setMajors(majRes.data);
+  const fetchFaculties = async () => {
+    const res = await getFaculties();
+    console.log("Fetched faculties:", res.data);
+    setFaculties(res.data);
+  };
+
+  const fetchMajorsByFacultyId = async (facultyId) => {
+    const res = await getMajorsByFacultyId(facultyId);
+    console.log("Fetched majors:", res.data);
+    setMajors(res.data);
   };
 
   useEffect(() => {
     fetchUsers();
+    fetchFaculties();
   }, []);
 
+    const requiredFields = ["username", "firstname", "lastname", "role", "email","telephone"];
+    const { validate, resetErrors, errors } = useValidation(requiredFields);
+
   const handleOpen = (user = null) => {
-    fetchFacultiesAndMajors();
+    resetErrors();
     if (user) {
+      if (user.faculties_id) {
+        fetchMajorsByFacultyId(user.faculties_id);
+      } else {
+        setMajors([]);
+      }
       setForm({
         username: user.username || "",
         password: user.password || "",
@@ -116,11 +132,12 @@ function UserPage() {
         telephone: user.telephone || "",
         email: user.email || "",
         role: user.role || "",
-        faculties_id: user.faculties_id || "",
-        majors_id: user.majors_id || "",
+        faculties_id: user.faculties_id || null,
+        majors_id: user.majors_id || null,
       });
       setEditId(user.id);
     } else {
+      setMajors([]);
       setForm({
         username: "",
         password: "P@ssw0rd",
@@ -129,8 +146,8 @@ function UserPage() {
         telephone: "",
         email: "",
         role: "Teacher",
-        faculties_id: "",
-        majors_id: "",
+        faculties_id: null,
+        majors_id: null,
       });
       setEditId(null);
     }
@@ -139,10 +156,22 @@ function UserPage() {
 
   const handleClose = () => setOpen(false);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    if (e.target.name === "faculties_id") {
+      setForm({ ...form, [e.target.name]: e.target.value, majors_id: null });
+      if (e.target.value) {
+        fetchMajorsByFacultyId(e.target.value);
+      } else {
+        setMajors([]);
+      }
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
+  };
 
   const handleSubmit = async () => {
+    resetErrors();
+    if (!validate(form)) return;
     try {
       if (editId) {
         await updateUser(editId, form);
@@ -257,6 +286,8 @@ function UserPage() {
                   name="username"
                   value={form.username}
                   onChange={handleChange}
+                  error={!!errors.username}
+                  helperText={errors.username}
                   fullWidth
                 />
                 <TextField
@@ -265,6 +296,8 @@ function UserPage() {
                   name="firstname"
                   value={form.firstname}
                   onChange={handleChange}
+                  error={!!errors.firstname}
+                  helperText={errors.firstname}
                   fullWidth
                 />
                 <TextField
@@ -273,6 +306,8 @@ function UserPage() {
                   name="lastname"
                   value={form.lastname}
                   onChange={handleChange}
+                  error={!!errors.lastname}
+                  helperText={errors.lastname}
                   fullWidth
                 />
                 <TextField
@@ -281,6 +316,8 @@ function UserPage() {
                   name="telephone"
                   value={form.telephone}
                   onChange={handleChange}
+                  error={!!errors.telephone}
+                  helperText={errors.telephone}
                   fullWidth
                 />
                 <TextField
@@ -289,6 +326,8 @@ function UserPage() {
                   name="email"
                   value={form.email}
                   onChange={handleChange}
+                  error={!!errors.email}
+                  helperText={errors.email}
                   fullWidth
                 />
                 <FormControl fullWidth margin="dense">
@@ -301,6 +340,9 @@ function UserPage() {
                     label="Faculty"
                     onChange={handleChange}
                   >
+                    <MenuItem value={null}>
+                      <em>-</em>
+                    </MenuItem>
                     {faculties.map((f) => (
                       <MenuItem key={f.id} value={f.id}>
                         {f.name}
@@ -318,6 +360,9 @@ function UserPage() {
                     label="Major"
                     onChange={handleChange}
                   >
+                    <MenuItem value={null}>
+                      <em>-</em>
+                    </MenuItem>
                     {majors.map((m) => (
                       <MenuItem key={m.id} value={m.id}>
                         {m.name}
@@ -334,6 +379,8 @@ function UserPage() {
                     name="role"
                     value={form.role}
                     onChange={handleChange}
+                    error={!!errors.role}
+                    helperText={errors.role}
                   >
                     {USER_ROLES.map((role) => (
                       <MenuItem key={role.value} value={role.value}>
