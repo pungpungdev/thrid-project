@@ -13,79 +13,83 @@ import { useAuth } from "./hooks/useAuth";
 import ComparePage from "./pages/ComparePage";
 import AnnualDataPage from "./pages/AnnualDataPage";
 import PreviewPage from "./pages/PreviewPage";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 function App() {
   const { role } = useAuth();
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute
-              allowedRoles={["Admin", "Teacher", "Committee", "Student"]}
-            >
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/annual-data"
-          element={
-            <ProtectedRoute
-              allowedRoles={["Admin", "Teacher", "Committee", "Student"]}
-            >
-              <AnnualDataPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <UserPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/majors"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <MajorPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/faculties"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <FacultyPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/students"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <StudentPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/subjects"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <SubjectPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/course" element={<CoursePage />} />
-        <Route path="/compare" element={<ComparePage />} />
-        <Route path="/preview" element={<PreviewPage />} />
-        <Route path="/profileStudent" element={<ProfileStudent />} />
-      </Routes>
-    </BrowserRouter>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute
+                allowedRoles={["Admin", "Teacher", "Committee", "Student"]}
+              >
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/annual-data"
+            element={
+              <ProtectedRoute
+                allowedRoles={["Admin", "Teacher", "Committee", "Student"]}
+              >
+                <AnnualDataPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <UserPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/majors"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <MajorPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/faculties"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <FacultyPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/students"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <StudentPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/subjects"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <SubjectPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/course" element={<CoursePage />} />
+          <Route path="/compare" element={<ComparePage />} />
+          <Route path="/preview" element={<PreviewPage />} />
+          <Route path="/profileStudent" element={<ProfileStudent />} />
+        </Routes>
+      </BrowserRouter>
+    </LocalizationProvider>
   );
 }
 

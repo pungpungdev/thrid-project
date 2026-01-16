@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import * as annualCourseService from "../services/annualCourseService";
 import { getFaculties } from "../services/facultyService";
-import { getMajors } from "../services/majorService";
+import { getMajorsByFacultyId, getMajors } from "../services/majorService";
 import { getSubjects } from "../services/subjectService";
 import DefaultTable from "../components/DefaultTable";
 import {
@@ -23,6 +23,7 @@ import {
   DialogActions,
   Chip,
 } from "@mui/material";
+import { DatePicker } from "@mui/x-date-pickers";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ContentPasteSearchIcon from "@mui/icons-material/ContentPasteSearch";
@@ -35,19 +36,22 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { formatDateDDMMYYYY } from "../utils/dateUtils";
 import CustomAlert from "../components/CustomAlert";
+import { useValidation } from "../hooks/useValidation";
+import dayjs from "dayjs";
 
 function CoursePage() {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState(null);
   const [faculties, setFaculties] = useState([]);
   const [majors, setMajors] = useState([]);
+  const [allMajors, setAllMajors] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
     year: "",
     term: "",
-    startDate: "",
-    endDate: "",
+    startDate: null,
+    endDate: null,
     facultyId: "",
     majorId: "",
     subjectIds: [],
@@ -61,23 +65,53 @@ function CoursePage() {
   });
 
   useEffect(() => {
-    getFaculties().then((res) => setFaculties(res.data));
-    getMajors().then((res) => setMajors(res.data));
     getSubjects().then((res) => setSubjects(res.data));
+    fetchFaculties();
     fetchCourses();
+    fetchMajors();
   }, []);
+
+  const requiredFields = [
+    "year",
+    "term",
+    "startDate",
+    "endDate",
+    "subjectIds",
+    "facultyId",
+    "majorId",
+  ];
+  const { validate, resetErrors, errors } = useValidation(requiredFields);
 
   const fetchCourses = async () => {
     const res = await annualCourseService.getAnnualCourses();
     setCourses(res.data);
   };
 
+  const fetchMajors = async () => {
+    const res = await getMajors();
+    setAllMajors(res.data);
+  }
+
+  const fetchFaculties = async () => {
+    const res = await getFaculties();
+    console.log("Fetched faculties:", res.data);
+    setFaculties(res.data);
+  };
+
+  const fetchMajorsByFacultyId = async (facultyId) => {
+    const res = await getMajorsByFacultyId(facultyId);
+    console.log("Fetched majors:", res.data);
+    setMajors(res.data);
+  };
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    console.log(e.target.name, e.target.value);
+    if (e.target.name === "facultyId") {
+      fetchMajorsByFacultyId(e.target.value);
+      setForm({ ...form, [e.target.name]: e.target.value, majorId: "" });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubjectsChange = (e) => {
@@ -87,7 +121,39 @@ function CoursePage() {
     }));
   };
 
+  const handleOpen = (course = null) => {
+    resetErrors();
+    console.log(course);
+    if (course) {
+      fetchMajorsByFacultyId(course.facultyId);
+      setForm({
+        year: course.year || "",
+        term: course.term || "",
+        startDate: dayjs(course.startDate) || null,
+        endDate: dayjs(course.endDate) || null,
+        facultyId: course.facultyId || "",
+        majorId: course.majorId || "",
+        subjectIds: course.subjects?.map((s) => s.subjectId) || [],
+      });
+      setEditId(course.id);
+    } else {
+      setForm({
+        year: "",
+        term: "",
+        startDate: null,
+        endDate: null,
+        facultyId: "",
+        majorId: "",
+        subjectIds: [],
+      });
+      setEditId(null);
+    }
+    setOpen(true);
+  };
+
   const handleSubmit = async () => {
+    resetErrors();
+    if (!validate(form)) return;
     try {
       const { subjectIds, ...courseData } = form;
       let res;
@@ -96,10 +162,10 @@ function CoursePage() {
       courseData.facultyId = parseInt(courseData.facultyId) || null;
       courseData.majorId = parseInt(courseData.majorId) || null;
       courseData.startDate = courseData.startDate
-        ? new Date(courseData.startDate).toISOString()
+        ? courseData.startDate.toISOString()
         : null;
       courseData.endDate = courseData.endDate
-        ? new Date(courseData.endDate).toISOString()
+        ? courseData.endDate.toISOString()
         : null;
 
       if (editId) {
@@ -111,41 +177,17 @@ function CoursePage() {
             annualCourseService.createAnnualCourseSubject({
               annualCourseId: res.data.id,
               subjectId,
-              /*type: "BASE",*/
             })
           )
         );
       }
       setOpen(false);
       setEditId(null);
-      setForm({
-        year: "",
-        term: "",
-        startDate: "",
-        endDate: "",
-        facultyId: "",
-        majorId: "",
-        subjectIds: [],
-      });
       fetchCourses();
       showAlert("success", "Saved successfully!");
     } catch (error) {
       showAlert("error", error.message || "Something went wrong!");
     }
-  };
-
-  const handleEdit = (row) => {
-    setEditId(row.id);
-    setForm({
-      year: parseInt(row.year),
-      term: row.term,
-      startDate: row.startDate?.slice(0, 10) || "",
-      endDate: row.endDate?.slice(0, 10) || "",
-      facultyId: row.facultyId,
-      majorId: row.majorId,
-      subjectIds: row.subjects?.map((s) => s.subjectId) || [],
-    });
-    setOpen(true);
   };
 
   const handleDelete = async (id) => {
@@ -180,7 +222,7 @@ function CoursePage() {
       field: "major",
       headerName: "สาขา",
       renderCell: ({ row }) =>
-        majors.find((m) => m.id === row.majorId)?.name || row.majorId,
+        allMajors.find((m) => m.id === row.majorId)?.name || row.majorId,
     },
     {
       field: "actives",
@@ -233,7 +275,7 @@ function CoursePage() {
           <Button
             variant="contained"
             size="small"
-            onClick={() => handleEdit(row)}
+            onClick={() => handleOpen(row)}
           >
             <EditIcon fontSize="small" />
           </Button>
@@ -265,13 +307,7 @@ function CoursePage() {
           <Typography variant="h5" fontWeight={"bold"} mb={2}>
             จัดการหลักสูตรประจำปี
           </Typography>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setOpen(true);
-              setEditId(null);
-            }}
-          >
+          <Button variant="contained" onClick={() => handleOpen()}>
             Add Annual Course
           </Button>
         </Box>
@@ -302,6 +338,8 @@ function CoursePage() {
               onChange={handleChange}
               fullWidth
               margin="dense"
+              error={!!errors.year}
+              helperText={errors.year}
             />
             <TextField
               label="Term"
@@ -310,24 +348,38 @@ function CoursePage() {
               onChange={handleChange}
               fullWidth
               margin="dense"
+              error={!!errors.term}
+              helperText={errors.term}
             />
-            <TextField
-              label="Start Date"
+            <DatePicker
               name="startDate"
-              type="date"
+              label="Start Date"
               value={form.startDate}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
+              onChange={(newValue) =>
+                handleChange({ target: { name: "startDate", value: newValue } })
+              }
+              format="DD/MM/YYYY"
+              slotProps={{
+                textField: {
+                  error: !!errors.startDate,
+                  helperText: errors.startDate,
+                },
+              }}
             />
-            <TextField
-              label="End Date"
+            <DatePicker
               name="endDate"
-              type="date"
+              label="End Date"
               value={form.endDate}
-              onChange={handleChange}
-              fullWidth
-              margin="dense"
+              onChange={(newValue) =>
+                handleChange({ target: { name: "endDate", value: newValue } })
+              }
+              format="DD/MM/YYYY"
+              slotProps={{
+                textField: {
+                  error: !!errors.endDate,
+                  helperText: errors.endDate,
+                },
+              }}
             />
             <FormControl fullWidth margin="dense">
               <InputLabel>Faculty</InputLabel>
@@ -336,6 +388,8 @@ function CoursePage() {
                 value={form.facultyId}
                 onChange={handleChange}
                 label="Faculty"
+                error={!!errors.facultyId}
+                helperText={errors.facultyId}
               >
                 {faculties.map((f) => (
                   <MenuItem key={f.id} value={f.id}>
@@ -351,7 +405,8 @@ function CoursePage() {
                 value={form.majorId}
                 onChange={handleChange}
                 label="Major"
-                disabled={!form.facultyId}
+                error={!!errors.majorId}
+                helperText={errors.majorId}
               >
                 {majors
                   .filter((m) => m.faculty_id === Number(form.facultyId))
@@ -376,6 +431,8 @@ function CoursePage() {
                     .map((s) => s.subName)
                     .join(", ")
                 }
+                error={!!errors.subjectIds}
+                helperText={errors.subjectIds}
               >
                 {subjects.map((subject) => (
                   <MenuItem key={subject.id} value={subject.id}>
