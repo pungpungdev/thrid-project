@@ -8,6 +8,8 @@ export const updateAnnualCourse = (id, data) =>
   api.put(`/api/annual-courses/${id}`, data);
 export const deleteAnnualCourse = (id) =>
   api.delete(`/api/annual-courses/${id}`);
+export const activeAnnualCourse = (id) =>
+  api.patch(`/api/annual-courses/active/${id}`);
 
 export const getAnnualCourseSubjects = () =>
   api.get("/api/annual-courses/subject");
@@ -19,3 +21,5 @@ export const updateAnnualCourseSubject = (id, data) =>
   api.put(`/api/annual-courses/subject/${id}`, data);
 export const deleteAnnualCourseSubject = (id) =>
   api.delete(`/api/annual-courses/subject/${id}`);
+export const deleteAnnualCourseSubjectByAnnualCourseId = (id) =>
+  api.delete(`/api/annual-courses/subject-by-annual-course/${id}`);

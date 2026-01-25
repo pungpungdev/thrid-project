@@ -106,6 +106,25 @@ router.delete("/:id", annualCourseController.deleteAnnualCourse);
 
 /**
  * @swagger
+ * /api/annual-courses/{id}:
+ *   patch:
+ *     summary: Active annual course by ID
+ *     tags: [AnnualCourse]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Annual course ID
+ *     responses:
+ *       200:
+ *         description: Actived
+ */
+router.patch("/active/:id", annualCourseController.activeAnuualCourse);
+
+/**
+ * @swagger
  * tags:
  *   name: AnnualCourseSubject
  *   description: AnnualCourseSubject management
@@ -205,5 +224,24 @@ router.put("/subject/:id", annualCourseController.updateAnnualCourseSubject);
  *         description: Deleted
  */
 router.delete("/subject/:id", annualCourseController.deleteAnnualCourseSubject);
+
+/**
+ * @swagger
+ * /api/annual-courses/subject-by-annual-course/{id}:
+ *   delete:
+ *     summary: Delete annual course subject by annual course ID
+ *     tags: [AnnualCourseSubject]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: Annual course subject ID
+ *     responses:
+ *       200:
+ *         description: Deleted
+ */
+router.delete("/subject-by-annual-course/:id", annualCourseController.deleteAnnualCourseSubjectByAnnualCourseId);
 
 module.exports = router;

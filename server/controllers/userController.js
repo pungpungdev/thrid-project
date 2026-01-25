@@ -11,6 +11,14 @@ exports.getUsers = async (req, res) => {
   res.json(users);
 };
 
+exports.getInactiveUsers = async (req, res) => {
+  const users = await prisma.user.findMany({
+    where: { actives: false },
+    include: { major: true, faculty: true },
+  });
+  res.json(users);
+};
+
 exports.getUserById = async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -60,6 +68,18 @@ exports.softDeleteUser = async (req, res) => {
       data: { actives: false },
     });
     res.json({ message: "User deactivated", user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.ActiveUser = async (req, res) => {
+  try {
+    const user = await prisma.user.update({
+      where: { id: parseInt(req.params.id) },
+      data: { actives: true },
+    });
+    res.json({ message: "User activated", user });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

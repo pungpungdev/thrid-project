@@ -55,6 +55,7 @@ function CoursePage() {
     facultyId: "",
     majorId: "",
     subjectIds: [],
+    actives: true,
   });
   const [subjectDialogOpen, setSubjectDialogOpen] = useState(false);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
@@ -90,7 +91,7 @@ function CoursePage() {
   const fetchMajors = async () => {
     const res = await getMajors();
     setAllMajors(res.data);
-  }
+  };
 
   const fetchFaculties = async () => {
     const res = await getFaculties();
@@ -134,6 +135,7 @@ function CoursePage() {
         facultyId: course.facultyId || "",
         majorId: course.majorId || "",
         subjectIds: course.subjects?.map((s) => s.subjectId) || [],
+        actives: course.actives,
       });
       setEditId(course.id);
     } else {
@@ -145,6 +147,7 @@ function CoursePage() {
         facultyId: "",
         majorId: "",
         subjectIds: [],
+        actives: true,
       });
       setEditId(null);
     }
@@ -157,6 +160,7 @@ function CoursePage() {
     try {
       const { subjectIds, ...courseData } = form;
       let res;
+      let res2;
       courseData.year = parseInt(courseData.year);
       courseData.term = parseInt(courseData.term);
       courseData.facultyId = parseInt(courseData.facultyId) || null;
@@ -170,6 +174,18 @@ function CoursePage() {
 
       if (editId) {
         res = await annualCourseService.updateAnnualCourse(editId, courseData);
+        res2 =
+          await annualCourseService.deleteAnnualCourseSubjectByAnnualCourseId(
+            editId
+          );
+        await Promise.all(
+          subjectIds.map((subjectId) =>
+            annualCourseService.createAnnualCourseSubject({
+              annualCourseId: res.data.id,
+              subjectId,
+            })
+          )
+        );
       } else {
         res = await annualCourseService.createAnnualCourse(courseData);
         await Promise.all(
@@ -194,6 +210,11 @@ function CoursePage() {
     await annualCourseService.deleteAnnualCourse(id);
     fetchCourses();
   };
+
+  const handleActive = async (id) => {
+    await annualCourseService.activeAnnualCourse(id);
+    fetchCourses();
+  }
 
   const showAlert = (severity, message) => {
     setAlert({ open: true, severity, message });
@@ -279,14 +300,29 @@ function CoursePage() {
           >
             <EditIcon fontSize="small" />
           </Button>
-          <Button
-            variant="contained"
-            size="small"
-            color="error"
-            onClick={() => handleDelete(row.id)}
-          >
-            <DeleteIcon fontSize="small" />
-          </Button>
+          {row.actives ? (
+            <Button
+              variant="contained"
+              size="small"
+              color="error"
+              if={row.actives === true}
+              onClick={() => handleDelete(row.id)}
+            >
+              {/* <DeleteIcon fontSize="small" /> */}
+              ปิดใช้งาน
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              size="small"
+              color="success"
+              if={row.actives === false}
+              onClick={() => handleActive(row.id)}
+            >
+              {/* <DeleteIcon fontSize="small" /> */}
+              เปิดใช้งาน
+            </Button>
+          )}
         </Box>
       ),
     },

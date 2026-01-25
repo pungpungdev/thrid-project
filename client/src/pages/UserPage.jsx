@@ -9,6 +9,8 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  getInactiveUsers,
+  updateActiveUser,
 } from "../services/userService";
 import { getFaculties } from "../services/facultyService";
 import { getMajorsByFacultyId } from "../services/majorService";
@@ -25,8 +27,9 @@ import {
   MenuItem,
   InputLabel,
   FormControl,
-  Autocomplete,
   Chip,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import { USER_ROLES } from "../shares/roles";
 import { useValidation } from "../hooks/useValidation";
@@ -67,6 +70,7 @@ const columns = [
 
 function UserPage() {
   const [users, setUsers] = useState([]);
+  const [usersTab2, setUsersTab2] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     username: "",
@@ -96,6 +100,12 @@ function UserPage() {
     setUsers(res.data);
   };
 
+  const fetchUsersTab2 = async () => {
+    const res = await getInactiveUsers();
+    console.log("Fetched inactive users:", res.data);
+    setUsersTab2(res.data);
+  };
+
   const fetchFaculties = async () => {
     const res = await getFaculties();
     console.log("Fetched faculties:", res.data);
@@ -110,11 +120,19 @@ function UserPage() {
 
   useEffect(() => {
     fetchUsers();
+    fetchUsersTab2();
     fetchFaculties();
   }, []);
 
-    const requiredFields = ["username", "firstname", "lastname", "role", "email","telephone"];
-    const { validate, resetErrors, errors } = useValidation(requiredFields);
+  const requiredFields = [
+    "username",
+    "firstname",
+    "lastname",
+    "role",
+    "email",
+    "telephone",
+  ];
+  const { validate, resetErrors, errors } = useValidation(requiredFields);
 
   const handleOpen = (user = null) => {
     resetErrors();
@@ -193,7 +211,7 @@ function UserPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.message || "Error occurred",
+        message: error.response?.data?.error || error.message || "Error occurred",
         severity: "error",
       });
     }
@@ -203,6 +221,7 @@ function UserPage() {
     try {
       await deleteUser(id);
       fetchUsers();
+      fetchUsersTab2();
       setAlert({
         open: true,
         message: "User deleted successfully!",
@@ -211,10 +230,35 @@ function UserPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.message || "Error occurred",
+        message: error.response?.data?.error || error.message || "Error occurred",
         severity: "error",
       });
     }
+  };
+
+  const handleRestoreUser = async (id) => {
+    try {
+      await updateActiveUser(id);
+      fetchUsers();
+      fetchUsersTab2();
+      setAlert({
+        open: true,
+        message: "User restored successfully!",
+        severity: "success",
+      });
+    } catch (error) {
+      setAlert({
+        open: true,
+        message: error.response?.data?.error || error.message || "Error occurred",
+        severity: "error",
+      });
+    }
+  };
+
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleChangeActiveTab = (event, newValue) => {
+    setActiveTab(newValue);
   };
 
   const rows = users.map((user) => ({
@@ -244,6 +288,25 @@ function UserPage() {
       </>
     ),
   }));
+  const rowsTab2 = usersTab2.map((user) => ({
+    ...user,
+    role: user.role || "Teacher",
+    facultyName: user.faculty?.name || "null",
+    majorName: user.major?.name || "null",
+    actions: (
+      <>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => handleRestoreUser(user.id)}
+          >
+            กู้คืนผู้ใช้งาน
+          </Button>
+        </Box>
+      </>
+    ),
+  }));
 
   return (
     <>
@@ -265,8 +328,16 @@ function UserPage() {
               Add User
             </Button>
           </Box>
-
-          <DefaultTable columns={columns} rows={rows} />
+          <Tabs value={activeTab} onChange={handleChangeActiveTab}>
+            <Tab label="ผู้ใช้งาน" />
+            <Tab label="ผู้ใช้งานที่ถูกลบ" />
+          </Tabs>
+          <div role="tabpanel" hidden={activeTab !== 0}>
+            <DefaultTable columns={columns} rows={rows} />
+          </div>
+          <div role="tabpanel" hidden={activeTab !== 1}>
+            <DefaultTable columns={columns} rows={rowsTab2} />
+          </div>
 
           <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{editId ? "Edit User" : "Add User"}</DialogTitle>

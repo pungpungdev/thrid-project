@@ -20,13 +20,6 @@ exports.getMajorById = async (req, res) => {
   major ? res.json(major) : res.status(404).json({ error: "Major not found" });
 };
 
-exports.getMajorByFacultyId = async (req, res) => {
-  const major = await prisma.major.findMany({
-    where: { faculty_id: parseInt(req.params.id) },
-  });
-  major ? res.json(major) : res.status(404).json({ error: "Major not found" });
-};
-
 exports.createMajor = async (req, res) => {
   try {
     const major = await prisma.major.create({ data: req.body });

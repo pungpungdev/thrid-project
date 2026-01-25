@@ -68,6 +68,18 @@ exports.deleteAnnualCourse = async (req, res) => {
   }
 };
 
+exports.activeAnuualCourse = async (req, res) => {
+  try {
+    await prisma.annualCourse.update({
+      where: { id: Number(req.params.id) },
+      data: { actives: true },
+    });
+    res.json({ message: "AnnualCourse actived" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.createAnnualCourseSubject = async (req, res) => {
   try {
     const acSubject = await prisma.annualCourseSubject.create({
@@ -119,6 +131,17 @@ exports.deleteAnnualCourseSubject = async (req, res) => {
   try {
     await prisma.annualCourseSubject.delete({
       where: { id: Number(req.params.id) },
+    });
+    res.json({ message: "AnnualCourseSubject deleted" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteAnnualCourseSubjectByAnnualCourseId = async (req, res) => {
+  try {
+    await prisma.annualCourseSubject.deleteMany({
+      where: { annualCourseId: Number(req.params.id) },
     });
     res.json({ message: "AnnualCourseSubject deleted" });
   } catch (error) {

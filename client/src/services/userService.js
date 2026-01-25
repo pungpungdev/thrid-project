@@ -1,7 +1,9 @@
 import api from '../api/axios';
 
 export const getUsers = () => api.get('/api/users');
+export const getInactiveUsers = () => api.get('/api/users/inactive');
 export const getUser = (id) => api.get(`/api/users/${id}`);
 export const createUser = (data) => api.post('/api/users', data);
 export const updateUser = (id, data) => api.put(`/api/users/${id}`, data);
 export const deleteUser = (id) => api.delete(`/api/users/${id}`);
+export const updateActiveUser = (id) => api.patch(`/api/users/active/${id}`);

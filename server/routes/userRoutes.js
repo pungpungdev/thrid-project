@@ -13,7 +13,7 @@ const userController = require('../controllers/userController');
  * @swagger
  * /api/users:
  *   get:
- *     summary: Get all users
+ *     summary: Get all active users
  *     tags: [Users]
  *     responses:
  *       200:
@@ -38,6 +38,36 @@ const userController = require('../controllers/userController');
  *                   actives:      { type: boolean }
  */
 router.get('/', userController.getUsers);
+
+/**
+ * @swagger
+ * /api/users/inactive:
+ *   get:
+ *     summary: Get all inactive users
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:           { type: integer }
+ *                   username:     { type: string }
+ *                   firstname:    { type: string }
+ *                   lastname:     { type: string }
+ *                   telephone:    { type: string }
+ *                   email:        { type: string }
+ *                   faculties_id: { type: integer }
+ *                   majors_id:    { type: integer }
+ *                   profile_img:  { type: string }
+ *                   role:         { type: boolean }
+ *                   actives:      { type: boolean }
+ */
+router.get('/inactive', userController.getInactiveUsers);
 
 /**
  * @swagger
@@ -158,5 +188,25 @@ router.put('/:id', userController.updateUser);
  *         description: User not found
  */
 router.delete('/:id', userController.softDeleteUser);
+
+/**
+ * @swagger
+ * /api/users/active/{id}:
+ *   patch:
+ *     summary: Activate a user by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: User ID
+ *         schema: { type: integer }
+ *     responses:
+ *       200:
+ *         description: User activated
+ *       404:
+ *         description: User not found
+ */
+router.patch('/active/:id', userController.ActiveUser);
 
 module.exports = router;
