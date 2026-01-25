@@ -67,14 +67,14 @@ function AnnualDataPage() {
     }
   };
 
-  const uniqueSubjects = Array.from(
+  /* const uniqueSubjects = Array.from(
     new Map(
       selectedSubjects.map((subject) => [
         subject.subject.subGroup.codeSubject, // ใช้ค่านี้เป็น key
         subject,
       ])
     ).values()
-  );
+  ); */
 
   const handleCompare = (year) => {
     navigate(`/compare?year=${year}`);
@@ -148,6 +148,7 @@ function AnnualDataPage() {
             <Table>
               <TableHead>
                 <TableRow>
+                  <TableCell>ภาคเรียนที่</TableCell>
                   <TableCell>คณะ</TableCell>
                   <TableCell>สาขา</TableCell>
                   <TableCell align="center">จำนวนวิชา</TableCell>
@@ -156,11 +157,12 @@ function AnnualDataPage() {
               </TableHead>
               <TableBody>
                 {summary.map((course) => {
-                  const key = `${course.faculty.id}-${course.major.id}`;
+                  const key = `${course.faculty.id}-${course.major.id}-${course.id}`;
                   const subjectCount = course.subjects.length;
 
                   return (
                     <TableRow key={key}>
+                      <TableCell>{course.term}</TableCell>
                       <TableCell>{course.faculty.name}</TableCell>
                       <TableCell>{course.major.name}</TableCell>
                       <TableCell align="center">{subjectCount}</TableCell>
@@ -205,22 +207,20 @@ function AnnualDataPage() {
                 <TableHead>
                   <TableRow sx={{ backgroundColor: "#f0f0f0" }}>
                     <TableCell>รหัสวิชา</TableCell>
-                    <TableCell>ชื่อหน่วยกิต</TableCell>
+                    <TableCell>ชื่อวิชา</TableCell>
                     <TableCell>หน่วยกิต</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {uniqueSubjects.map((subject) => (
-                    <TableRow key={subject.id}>
-                      <TableCell>
-                        {subject.subject.subGroup.codeSubject}
-                      </TableCell>
-                      <TableCell>
-                        {subject.subject.subGroup.nameSubject}
-                      </TableCell>
-                      <TableCell>{subject.subject.subGroup.unit}</TableCell>
-                    </TableRow>
-                  ))}
+                  {
+                    /* uniqueSubjects */ selectedSubjects.map((subject) => (
+                      <TableRow key={subject.id}>
+                        <TableCell>{subject.subject.subId}</TableCell>
+                        <TableCell>{subject.subject.subName}</TableCell>
+                        <TableCell>{subject.subject.subUnit}</TableCell>
+                      </TableRow>
+                    ))
+                  }
                 </TableBody>
               </Table>
             </TableContainer>
