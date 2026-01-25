@@ -207,14 +207,24 @@ function CoursePage() {
   };
 
   const handleDelete = async (id) => {
-    await annualCourseService.deleteAnnualCourse(id);
-    fetchCourses();
+    try {
+      await annualCourseService.deleteAnnualCourse(id);
+      fetchCourses();
+      showAlert("success", "Deactived successfully!");
+    } catch (error) {
+      showAlert("error", error.message || "Something went wrong!");
+    }
   };
 
   const handleActive = async (id) => {
-    await annualCourseService.activeAnnualCourse(id);
-    fetchCourses();
-  }
+    try {
+      await annualCourseService.activeAnnualCourse(id);
+      fetchCourses();
+      showAlert("success", "Actived successfully!");
+    } catch (error) {
+      showAlert("error", error.message || "Something went wrong!");
+    }
+  };
 
   const showAlert = (severity, message) => {
     setAlert({ open: true, severity, message });

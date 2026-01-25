@@ -7,7 +7,7 @@ import UploadFileIcon from "@mui/icons-material/UploadFile";
 import DownloadIcon from "@mui/icons-material/Download";
 import * as studentService from "../services/studentService";
 import { getFaculties } from "../services/facultyService";
-import { getMajors } from "../services/majorService";
+import { getMajors, getMajorsByFacultyId } from "../services/majorService";
 import { useBase64 } from "../hooks/useBase64";
 import defaultProfileImg from "../assets/image/profile.png";
 import { useValidation } from "../hooks/useValidation";
@@ -59,6 +59,7 @@ function StudentPage() {
   const [students, setStudents] = useState([]);
   const [faculties, setFaculties] = useState([]);
   const [majors, setMajors] = useState([]);
+  //const [allMajors, setAllMajors] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     student_id: "",
@@ -103,19 +104,26 @@ function StudentPage() {
     const res = await getFaculties();
     setFaculties(res.data);
   };
-  const fetchMajors = async () => {
+  /* const fetchMajors = async () => {
     const res = await getMajors();
+    setAllMajors(res.data);
+  }; */
+  const fetchMajorsByFacultyId = async (facultyId) => {
+    const res = await getMajorsByFacultyId(facultyId);
+    console.log("Fetched majors:", res.data);
     setMajors(res.data);
   };
 
   useEffect(() => {
     fetchStudents();
     fetchFaculties();
-    fetchMajors();
+    //fetchMajors();
   }, []);
 
   const handleOpen = (student = null) => {
+    resetErrors();
     if (student) {
+      fetchMajorsByFacultyId(student.faculties_id);
       setForm({
         student_id: student.student_id || "",
         password: student.password || "",
@@ -154,8 +162,13 @@ function StudentPage() {
   const handleClose = () => setOpen(false);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    console.log(e.target.name, e.target.value);
+    if (e.target.name === "faculties_id") {
+      fetchMajorsByFacultyId(e.target.value);
+      setForm({ ...form, [e.target.name]: e.target.value, majors_id: "" });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubmit = async () => {
@@ -185,8 +198,17 @@ function StudentPage() {
   };
 
   const handleDelete = async (id) => {
-    await studentService.deleteStudent(id);
-    fetchStudents();
+    try {
+      await studentService.deleteStudent(id);
+      fetchStudents();
+      setAlert({
+        open: true,
+        severity: "success",
+        message: "Student deleted successfully!",
+      });
+    } catch (error) {
+      setAlert({ open: true, severity: "error", message: "Operation failed!" });
+    }
   };
 
   // Export students to Excel
@@ -430,7 +452,6 @@ function StudentPage() {
                     name="majors_id"
                     value={form.majors_id}
                     onChange={handleChange}
-                    disabled={!form.faculties_id}
                     error={!!errors.majors_id}
                     helperText={errors.majors_id}
                   >
