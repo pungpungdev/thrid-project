@@ -65,3 +65,203 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+@media print {
+  /* ตั้งค่าหน้ากระดาษ A4 แนวตั้ง */
+  @page {
+    size: A4 portrait;
+    margin: 10mm 5mm; /* ขอบกระดาษ */
+  }
+
+  /* ซ่อนปุ่มที่ไม่เกี่ยวข้องตอนพิมพ์ */
+  .no-print {
+    display: none !important;
+  }
+
+  /* บังคับให้พื้นหลังสีเทาของ Header ตารางแสดงผล */
+  thead tr {
+    background-color: #f2f2f2 !important;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* จัดการเรื่องการตัดหน้ากระดาษ */
+  .page-break {
+    page-break-before: always;
+  }
+}
+
+.print-container {
+  width: 210mm; /* ขนาด A4 */
+  margin: auto;
+  padding: 10px;
+  background: white;
+}
+
+
+
+
+.course-comparison-table th {
+  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  font-size: 12px;
+}
+.course-comparison-table td {
+  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  font-size: 12px;
+}
+
+/* ส่วนหัวเอกสาร */
+.official-header {
+  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  margin: 10px;
+}
+
+.header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+
+.university-info {
+  display: flex;
+  align-items: end;
+}
+
+.uni-th {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.uni-en {
+  font-size: 12px;
+}
+
+.document-title-section {
+  text-align: right;
+}
+
+.doc-code {
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: right;
+}
+
+.main-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.sub-title {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.header-divider {
+  border: 0;
+  border-top: 1px solid #000;
+  margin-top: 10px;
+}
+
+.student-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* แบ่ง 2 คอลัมน์ */
+  gap: 8px 20px;
+  font-size: 12px;
+  margin-top: 20px;
+  padding: 0 10px;
+}
+
+.info-item {
+  display: flex;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.value {
+  /*border-bottom: 1px dotted #888;*/ /* ทำเส้นประใต้ชื่อเหมือนแบบฟอร์ม */
+  flex-grow: 1;
+  padding-left: 10px;
+}
+/* ส่วนลายเซ็นและสรุปด้านล่าง */
+.official-footer {
+  margin: 20px 10px 10px 10px;
+  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  width: 100%;
+}
+
+.summary-section {
+  font-size: 12px;
+  margin-bottom: 40px;
+  font-weight: bold;
+}
+
+.summary-value {
+  display: inline-block;
+  min-width: 50px;
+  text-align: center;
+  border-bottom: 1px dotted #000;
+  padding: 0 10px;
+}
+
+.signature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* แบ่งเป็น 3 คอลัมน์เท่ากัน */
+  gap: 20px;
+  margin-bottom: 30px;
+  margin-left: -10px;
+}
+
+.signature-item {
+  text-align: center;
+  font-size: 12px;
+}
+
+.signature-line {
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.name-block {
+  margin-bottom: 4px;
+}
+
+.date-block {
+  font-size: 12px;
+}
+
+/* ส่วนโลโก้สำนักทะเบียนด้านล่าง */
+.ascar-footer {
+  padding-top: 15px;
+}
+
+.ascar-logo-section {
+  display: flex;
+  align-items: center;
+}
+
+.ascar-logo-placeholder {
+  font-size: 24px;
+  margin-right: 15px;
+  font-style: italic;
+  display: flex;
+  align-items: center;
+}
+
+.office-th {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.office-en {
+  font-size: 12px;
+  color: #666;
+}
+
+@media print {
+  .official-footer {
+    /* ป้องกันไม่ให้ส่วนลายเซ็นถูกตัดแบ่งหน้า */
+    page-break-inside: avoid;
+  }
+}

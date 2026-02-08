@@ -15,6 +15,7 @@ import AnnualDataPage from "./pages/AnnualDataPage";
 import PreviewPage from "./pages/PreviewPage";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import TestPage from "./pages/TestPage";
 
 function App() {
   const { role } = useAuth();
@@ -87,6 +88,7 @@ function App() {
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/profileStudent" element={<ProfileStudent />} />
+          <Route path="/test" element={<TestPage />} />
         </Routes>
       </BrowserRouter>
     </LocalizationProvider>
