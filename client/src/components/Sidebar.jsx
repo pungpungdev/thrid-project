@@ -81,7 +81,7 @@ function Sidebar() {
           </ListItemIcon>
           <ListItemText primary="สรุปผล" />
         </ListItem>
-        <ListItem button component={Link} to="/compare">
+        <ListItem button component={Link} to="/newCompare">
           <ListItemIcon sx={{ color: "#fff" }}>
             <CompareArrowsIcon />
           </ListItemIcon>

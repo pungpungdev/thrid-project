@@ -16,6 +16,7 @@ import PreviewPage from "./pages/PreviewPage";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TestPage from "./pages/TestPage";
+import NewComparePage from "./pages/newComparePage";
 
 function App() {
   const { role } = useAuth();
@@ -86,6 +87,16 @@ function App() {
           />
           <Route path="/course" element={<CoursePage />} />
           <Route path="/compare" element={<ComparePage />} />
+          <Route
+            path="/newCompare"
+            element={
+              <ProtectedRoute
+                allowedRoles={["Admin", "Teacher", "Committee", "Student"]}
+              >
+                <NewComparePage />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/profileStudent" element={<ProfileStudent />} />
           <Route path="/test" element={<TestPage />} />

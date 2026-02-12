@@ -194,24 +194,87 @@ async function seedDatabase() {
     })),
   });
 
+  const TransferData = [
+    {
+      id: "5-155-302",
+      name: "การฝึกงาน (Job Training)",
+      credits: "3(0-40-0)",
+      groups: [
+        {
+          groupId: 1,
+          courses: [
+            { id: "30202-8001", name: "ฝึกงาน", credits: 4, grade: "" },
+          ],
+
+          selected: false,
+        },
+        {
+          groupId: 2,
+          courses: [
+            { id: "30204-8001", name: "ฝึกงาน", credits: 4, grade: "4" },
+          ],
+          selected: true,
+        },
+        {
+          groupId: 3,
+          courses: [
+            { id: "30901-8001", name: "ฝึกงาน", credits: 4, grade: "" },
+          ],
+          selected: false,
+        },
+      ],
+    },
+    {
+      id: "5-151-121",
+      name: "การพัฒนาโปรแกรมคอมพิวเตอร์ (Computer Programming)",
+      credits: "3(0-6-3)",
+      groups: [
+        {
+          groupId: 1,
+          courses: [
+            {
+              id: "30204-2005",
+              name: "การเขียนโปรแกรมคอมพิวเตอร์",
+              credits: 3,
+              grade: "2.5",
+            },
+          ],
+          selected: true,
+        },
+        {
+          groupId: 2,
+          courses: [
+            {
+              id: "30901-1001",
+              name: "การโปรแกรมคอมพิวเตอร์เชิงโครงสร้าง",
+              credits: 3,
+              grade: "",
+            },
+          ],
+          selected: false,
+        },
+      ],
+    }
+  ];
   // Student Transfer
   const transfer = await prisma.studentTransfer.create({
     data: {
       studentId: student.id,
       annualCourseId: annualCourse.id,
       status: "APPROVED",
+      transferData: JSON.stringify(TransferData),
     },
   });
 
   // Transcript Grades
-  const grades = [4.0, 2.5, 3.5, 3.0, 3.0, 3.0, 3.5];
+  /* const grades = [4.0, 2.5, 3.5, 3.0, 3.0, 3.0, 3.5];
   await prisma.studentTranscriptGrade.createMany({
     data: subjectsData.map((s, idx) => ({
       studentTransfer_id: transfer.id,
       subjectId: s.id,
       grade: grades[idx],
     })),
-  });
+  }); */
 
   console.log("✅ Seeding completed.");
 }

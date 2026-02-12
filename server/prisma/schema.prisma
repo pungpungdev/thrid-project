@@ -45,6 +45,8 @@ model Student {
   email        String
   actives      Boolean
 
+  StudentTranscriptGrade StudentTranscriptGrade[]
+
   faculty Faculty @relation(fields: [faculties_id], references: [id])
   major   Major   @relation(fields: [majors_id], references: [id])
 
@@ -103,6 +105,7 @@ model AnnualCourse {
   subjects        AnnualCourseSubject[]
   actives         Boolean               @default(false)
   StudentTransfer StudentTransfer[]
+  StudentTranscriptGrade StudentTranscriptGrade[]
 
   @@index([facultyId])
   @@index([majorId])
@@ -132,23 +135,27 @@ model StudentTransfer {
   id             Int      @id @default(autoincrement())
   studentId      Int
   annualCourseId Int
+  transferData Json?    @default("[]")
   status         String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   annualCourse AnnualCourse             @relation(fields: [annualCourseId], references: [id])
-  grades       StudentTranscriptGrade[]
 }
 
 model StudentTranscriptGrade {
   id                 Int    @id @default(autoincrement())
-  studentTransfer_id Int
   subjectId          Int
   grade              Float
+  studentId          Int
+  annualCourseId     Int
 
-  studentTransfer StudentTransfer @relation(fields: [studentTransfer_id], references: [id])
   subject         Subject         @relation(fields: [subjectId], references: [id])
+  student         Student         @relation(fields: [studentId], references: [id])
+  annualCourse AnnualCourse             @relation(fields: [annualCourseId], references: [id])
 
-  @@index([studentTransfer_id])
+
+  @@index([annualCourseId])
   @@index([subjectId])
+  @@index([studentId])
 }

@@ -248,7 +248,7 @@ function TestPage() {
             borderCollapse: "collapse",
             textAlign: "center",
           }}
-          class="course-comparison-table"
+          className="course-comparison-table"
         >
           <thead>
             <tr style={{ backgroundColor: "#f2f2f2" }}>

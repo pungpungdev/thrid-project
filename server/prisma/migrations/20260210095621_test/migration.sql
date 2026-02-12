@@ -116,6 +116,7 @@ CREATE TABLE `StudentTransfer` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `studentId` INTEGER NOT NULL,
     `annualCourseId` INTEGER NOT NULL,
+    `transferData` JSON NULL,
     `status` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
@@ -126,12 +127,14 @@ CREATE TABLE `StudentTransfer` (
 -- CreateTable
 CREATE TABLE `StudentTranscriptGrade` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `studentTransfer_id` INTEGER NOT NULL,
     `subjectId` INTEGER NOT NULL,
     `grade` DOUBLE NOT NULL,
+    `studentId` INTEGER NOT NULL,
+    `annualCourseId` INTEGER NOT NULL,
 
-    INDEX `StudentTranscriptGrade_studentTransfer_id_idx`(`studentTransfer_id`),
+    INDEX `StudentTranscriptGrade_annualCourseId_idx`(`annualCourseId`),
     INDEX `StudentTranscriptGrade_subjectId_idx`(`subjectId`),
+    INDEX `StudentTranscriptGrade_studentId_idx`(`studentId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -175,7 +178,10 @@ ALTER TABLE `AnnualCourseSubject` ADD CONSTRAINT `AnnualCourseSubject_subjectId_
 ALTER TABLE `StudentTransfer` ADD CONSTRAINT `StudentTransfer_annualCourseId_fkey` FOREIGN KEY (`annualCourseId`) REFERENCES `AnnualCourse`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `StudentTranscriptGrade` ADD CONSTRAINT `StudentTranscriptGrade_studentTransfer_id_fkey` FOREIGN KEY (`studentTransfer_id`) REFERENCES `StudentTransfer`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `StudentTranscriptGrade` ADD CONSTRAINT `StudentTranscriptGrade_subjectId_fkey` FOREIGN KEY (`subjectId`) REFERENCES `Subject`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `StudentTranscriptGrade` ADD CONSTRAINT `StudentTranscriptGrade_subjectId_fkey` FOREIGN KEY (`subjectId`) REFERENCES `Subject`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE `StudentTranscriptGrade` ADD CONSTRAINT `StudentTranscriptGrade_studentId_fkey` FOREIGN KEY (`studentId`) REFERENCES `Student`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `StudentTranscriptGrade` ADD CONSTRAINT `StudentTranscriptGrade_annualCourseId_fkey` FOREIGN KEY (`annualCourseId`) REFERENCES `AnnualCourse`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
