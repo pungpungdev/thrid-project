@@ -60,36 +60,14 @@ import { USER_ROLES } from "../shares/roles";
 import { useValidation } from "../hooks/useValidation";
 
 const columns = [
+  { field: "courseName", headerName: "หลักสูตร" },
+  { field: "year", headerName: "ปีการศึกษา" },
+  { field: "facultyName", headerName: "คณะ" },
+  { field: "majorName", headerName: "สาขา" },
+
   { field: "username", headerName: "ชื่อผู้ใช้" },
   { field: "firstname", headerName: "ชื่อ" },
   { field: "lastname", headerName: "นามสกุล" },
-  { field: "telephone", headerName: "เบอร์โทรศัพท์" },
-  { field: "email", headerName: "อีเมล" },
-  { field: "facultyName", headerName: "คณะ" },
-  { field: "majorName", headerName: "สาขา" },
-  {
-    field: "role",
-    headerName: "ระดับผู้ใช้งาน",
-    renderCell: (params) => {
-      let color = "default";
-      let label = params.value;
-      if (params.value === "Teacher") color = "warning";
-      else if (params.value === "Admin") color = "primary";
-      else if (params.value === "Committee") color = "orange";
-      return (
-        <Chip
-          label={label}
-          color={color === "orange" ? undefined : color}
-          sx={
-            color === "orange"
-              ? { backgroundColor: "orange", color: "#fff" }
-              : {}
-          }
-          size="small"
-        />
-      );
-    },
-  },
   { field: "actions", headerName: "ตัวเลือก" },
 ];
 
@@ -101,6 +79,7 @@ function NewComparePage() {
   const [dialogViewSubjects, setDialogViewSubjects] = useState(false);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [transferData, setTransferData] = useState([]);
 
   const reportRef = useRef(null);
   const navigate = useNavigate();
@@ -132,6 +111,24 @@ function NewComparePage() {
 
   const handleCompare = (course) => {
     setSelectedCourse(course);
+    const initTransferData = [];
+    course.subjects.forEach((subject) => {
+      initTransferData.push({
+        id: subject.subject.subId,
+        name: subject.subject.subName,
+        credits: subject.subject.subUnit,
+        groups: [
+          {
+            groupId: 1,
+            courses: [{ id: "", name: "", credits: null, grade: "" }],
+
+            selected: false,
+          },
+        ],
+      });
+    });
+    setTransferData(initTransferData);
+    console.log("Selected Course for Compare:", course);
   };
 
   const handleViewSubjects = (course) => {
@@ -196,8 +193,8 @@ function NewComparePage() {
   };
 
   useEffect(() => {
-    fetchUsers();
-    fetchUsersTab2();
+    //fetchUsers();
+    //fetchUsersTab2();
     fetchFaculties();
   }, []);
 
@@ -231,7 +228,6 @@ function NewComparePage() {
         majors_id: user.majors_id || null,
       });
       setEditId(user.id);
-
     } else {
       setMajors([]);
       setForm({
@@ -253,7 +249,7 @@ function NewComparePage() {
 
   const handleClose = () => {
     setOpen(false);
-};
+  };
 
   const handleChange = (e) => {
     if (e.target.name === "faculties_id") {
@@ -394,45 +390,16 @@ function NewComparePage() {
 
   /*copy compare page */
 
-  const [subjects, setSubjects] = useState([]);
-  const [course, setCourse] = useState({});
-  const [grades, setGrades] = useState({});
-  const fileInputRef = useRef();
-
-  useEffect(() => {
-    async function fetchData() {
-      const res = await dashboardService.getCompareSubjectByYear();
-      const courseData = Array.isArray(res.data) ? res.data[0] : res.data;
-      setCourse(courseData);
-      if (courseData && courseData.subjects) {
-        setSubjects(courseData.subjects);
-      }
-    }
-    fetchData();
-  }, []);
-
-  function groupBySubGroup(subjects) {
-    return subjects.reduce((acc, item) => {
-      const groupId = item.subject?.subGroupId || "no-group";
-      if (!acc[groupId]) acc[groupId] = [];
-      acc[groupId].push(item);
-      return acc;
-    }, {});
-  }
-
-  const groupedSubjects = groupBySubGroup(subjects);
-  const groupIds = Object.keys(groupedSubjects);
-
   const handleGradeChange = (subjectId, value) => {
     let val = value.replace(/[^0-9.]/g, "");
     const parts = val.split(".");
     if (parts.length > 2) val = parts[0] + "." + parts[1];
     if (parts[1]?.length > 2) val = parts[0] + "." + parts[1].slice(0, 2);
     if (parseFloat(val) > 4) val = "4";
-    setGrades((prev) => ({
+    /* setGrades((prev) => ({
       ...prev,
       [subjectId]: val,
-    }));
+    })); */
   };
 
   const handleSubmitGrades = async () => {
@@ -561,7 +528,7 @@ function NewComparePage() {
                                   <Button
                                     variant="outlined"
                                     size="small"
-                                    onClick={() => handleCompare(course.year)}
+                                    onClick={() => handleCompare(course)}
                                     sx={{ mr: 1 }}
                                   >
                                     เปรียบเทียบ
@@ -647,7 +614,7 @@ function NewComparePage() {
                     mb={3}
                     align="center"
                   >
-                    เปรียบเทียบรายวิชา (ปี {course.year || ""})
+                    เปรียบเทียบรายวิชา (ปี {selectedCourse.year || ""})
                   </Typography>
                   <Typography
                     variant="h6"
@@ -655,121 +622,296 @@ function NewComparePage() {
                     align="center"
                     fontWeight="normal"
                   >
-                    คณะ {course?.faculty?.name} สาขา {course?.major?.name}
+                    คณะ {selectedCourse?.faculty?.name} สาขา{" "}
+                    {selectedCourse?.major?.name}
                   </Typography>
 
-                  {groupIds.map((groupId, idx) => {
-                    const subjectList = groupedSubjects[groupId];
-                    const subGroupName =
-                      subjectList[0]?.subject?.subGroup?.nameSubject;
-                    const unit = subjectList[0]?.subject?.subGroup?.unit;
-
-                    console.log("Processing group:", unit);
-                    const codeSubject =
-                      subjectList[0]?.subject?.subGroup?.codeSubject;
+                  {transferData.map((subject, idx) => {
                     return (
-                      <Accordion
-                        key={groupId}
-                        defaultExpanded
-                        sx={{ width: "100%", maxWidth: 1200, mb: 3 }}
-                      >
-                        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                          <Typography marginRight={4} fontWeight="bold">
-                            {codeSubject}
-                          </Typography>
-                          <Typography marginRight={4} fontWeight="bold">
-                            {subGroupName}
-                          </Typography>
-                          <Typography marginRight={4} fontWeight="bold">
-                            หน่วยกิต {unit}
-                          </Typography>
-                        </AccordionSummary>
-                        <AccordionDetails sx={{ p: 0 }}>
-                          <Card
-                            variant="outlined"
-                            sx={{
-                              width: "100%",
-                              boxShadow: "none",
-                              border: "none",
-                            }}
-                          >
-                            <CardContent sx={{ p: 0 }}>
-                              <TableContainer
-                                component={Paper}
-                                sx={{ boxShadow: 0 }}
+                      <>
+                        <Accordion
+                          key={subject.id}
+                          defaultExpanded
+                          sx={{
+                            width: "100%",
+                            maxWidth: 1200,
+                            bgcolor: "rgb(238, 238, 238)",
+                          }}
+                        >
+                          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                            <Typography marginRight={4} fontWeight="bold">
+                              {subject.id}
+                            </Typography>
+                            <Typography marginRight={4} fontWeight="bold">
+                              {subject.name}
+                            </Typography>
+                            <Typography marginRight={4} fontWeight="bold">
+                              หน่วยกิต {subject.credits}
+                            </Typography>
+                            <Box sx={{ flexGrow: 1 }}></Box>
+                            <Button
+                              variant="contained"
+                              sx={{ mr: 2 }}
+                              onClick={(e) => {
+                                e.stopPropagation(); // สำคัญมาก! กันไม่ให้ Accordion พับ/กาง ตอนกดปุ่ม
+                                if (subject.groups.length < 3) {
+                                  const newGroup = [
+                                    ...subject.groups,
+                                    {
+                                      groupId: subject.groups.length + 1,
+                                      courses: [
+                                        {
+                                          id: "",
+                                          name: "",
+                                          credits: null,
+                                          grade: "",
+                                        },
+                                      ],
+
+                                      selected: false,
+                                    },
+                                  ];
+                                  setTransferData((prev) => {
+                                    const updatedTransferData = [...prev];
+                                    updatedTransferData[idx].groups = newGroup;
+                                    return updatedTransferData;
+                                  });
+                                }
+                              }}
+                              disabled={subject.groups.length >= 3}
+                            >
+                              + กลุ่มเทียบ
+                            </Button>
+                          </AccordionSummary>
+                          <AccordionDetails sx={{ p: 0 }}>
+                            {subject.groups.map((group, idx2) => (
+                              <Accordion
+                                key={group.groupId}
+                                defaultExpanded
+                                sx={{
+                                  width: "100%",
+                                  maxWidth: 1200,
+                                  bgcolor: "rgb(245, 245, 245)",
+                                }}
                               >
-                                <Table>
-                                  <TableHead>
-                                    <TableRow>
-                                      <TableCell
-                                        align="center"
-                                        sx={{ fontWeight: "bold" }}
+                                <AccordionSummary
+                                  expandIcon={<ExpandMoreIcon />}
+                                >
+                                  <Typography marginRight={4} fontWeight="bold">
+                                    กลุ่มเทียบที่ {group.groupId}
+                                  </Typography>
+                                  <Box sx={{ flexGrow: 1 }}></Box>
+                                  <Button
+                                    variant="contained"
+                                    color="warning"
+                                    sx={{ mr: 2 }}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      const updatedTransferData = [
+                                        ...transferData,
+                                      ];
+                                      updatedTransferData[idx].groups =
+                                        updatedTransferData[idx].groups.filter(
+                                          (g) => g.groupId !== group.groupId,
+                                        );
+                                      updatedTransferData[idx].groups =
+                                        updatedTransferData[idx].groups.map(
+                                          (g, index) => ({
+                                            ...g,
+                                            groupId: index + 1,
+                                          }),
+                                        );
+                                      setTransferData(updatedTransferData);
+                                    }}
+                                    disabled={subject.groups.length <= 1}
+                                  >
+                                    <DeleteForeverIcon />
+                                  </Button>
+                                </AccordionSummary>
+
+                                <AccordionDetails sx={{ p: 0 }}>
+                                  <Card
+                                    variant="outlined"
+                                    sx={{
+                                      width: "100%",
+                                      boxShadow: "none",
+                                      border: "none",
+                                    }}
+                                  >
+                                    <CardContent sx={{ p: 0 }}>
+                                      <TableContainer
+                                        component={Paper}
+                                        sx={{ boxShadow: 0 }}
                                       >
-                                        รหัสวิชา
-                                      </TableCell>
-                                      <TableCell
-                                        align="center"
-                                        sx={{ fontWeight: "bold" }}
-                                      >
-                                        ชื่อวิชา
-                                      </TableCell>
-                                      <TableCell
-                                        align="center"
-                                        sx={{ fontWeight: "bold" }}
-                                      >
-                                        หน่วยกิต
-                                      </TableCell>
-                                      <TableCell
-                                        align="center"
-                                        sx={{ fontWeight: "bold" }}
-                                      >
-                                        เกรด
-                                      </TableCell>
-                                    </TableRow>
-                                  </TableHead>
-                                  <TableBody>
-                                    {subjectList.map((item) => (
-                                      <TableRow key={item.id}>
-                                        <TableCell align="center">
-                                          {item.subject?.subId || ""}
-                                        </TableCell>
-                                        <TableCell align="left">
-                                          {item.subject?.subName || ""}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                          {item.subject?.subUnit || ""}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                          {item.subject?.id ? (
-                                            <TextField
-                                              size="small"
-                                              variant="outlined"
-                                              sx={{ width: 80 }}
-                                              value={
-                                                grades[item.subject.id] || ""
-                                              }
-                                              onChange={(e) =>
-                                                handleGradeChange(
-                                                  item.subject.id,
-                                                  e.target.value,
-                                                )
-                                              }
-                                              placeholder="เกรด"
-                                            />
-                                          ) : null}
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </TableContainer>
-                            </CardContent>
-                          </Card>
-                        </AccordionDetails>
-                        {idx < groupIds.length - 1 && (
-                          <Divider sx={{ my: 2 }} />
-                        )}
-                      </Accordion>
+                                        <Table>
+                                          <TableHead>
+                                            <TableRow>
+                                              <TableCell
+                                                align="center"
+                                                sx={{ fontWeight: "bold" }}
+                                              >
+                                                รหัสวิชา
+                                              </TableCell>
+                                              <TableCell
+                                                align="center"
+                                                sx={{ fontWeight: "bold" }}
+                                              >
+                                                ชื่อวิชา
+                                              </TableCell>
+                                              <TableCell
+                                                align="center"
+                                                sx={{ fontWeight: "bold" }}
+                                              >
+                                                หน่วยกิต
+                                              </TableCell>
+                                              <TableCell
+                                                align="center"
+                                                sx={{ fontWeight: "bold" }}
+                                              >
+                                                เกรด
+                                              </TableCell>
+                                              <TableCell
+                                                align="center"
+                                                sx={{ fontWeight: "bold" }}
+                                              ></TableCell>
+                                            </TableRow>
+                                          </TableHead>
+                                          <TableBody>
+                                            {group.courses.map((item, idx3) => (
+                                              <TableRow key={idx3}>
+                                                <TableCell align="center">
+                                                  <TextField
+                                                    sx={{ width: 140 }}
+                                                    variant="outlined"
+                                                    value={item.id}
+                                                    onChange={(e) =>
+                                                      console.log(
+                                                        e.target.value,
+                                                      )
+                                                    }
+                                                  />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                  <TextField
+                                                    sx={{ width: "100%" }}
+                                                    variant="outlined"
+                                                    value={item.name}
+                                                    onChange={(e) =>
+                                                      console.log(
+                                                        e.target.value,
+                                                      )
+                                                    }
+                                                  />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                  <TextField
+                                                    sx={{ width: 80 }}
+                                                    variant="outlined"
+                                                    type="number"
+                                                    value={item.credits}
+                                                    onChange={(e) =>
+                                                      console.log(
+                                                        e.target.value,
+                                                      )
+                                                    }
+                                                  />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                  <TextField
+                                                    type="number"
+                                                    variant="outlined"
+                                                    sx={{ width: 80 }}
+                                                    value={item.grade}
+                                                    onChange={(e) =>
+                                                      /* handleGradeChange(
+                                                          item.id,
+                                                          e.target.value,
+                                                        ) */
+                                                      console.log(
+                                                        e.target.value,
+                                                      )
+                                                    }
+                                                  />
+                                                </TableCell>
+                                                <TableCell align="center">
+                                                  <Button
+                                                    variant="contained"
+                                                    color="warning"
+                                                    onClick={(e) => {
+                                                      e.stopPropagation(); // สำคัญมาก! กันไม่ให้ Accordion พับ/กาง ตอนกดปุ่ม
+                                                      const newCourses =
+                                                        group.courses.filter(
+                                                          (_, i) => i !== idx3,
+                                                        );
+                                                      setTransferData(
+                                                        (prev) => {
+                                                          const updatedTransferData =
+                                                            [...prev];
+                                                          updatedTransferData[
+                                                            idx
+                                                          ].groups[
+                                                            idx2
+                                                          ].courses =
+                                                            newCourses;
+                                                          return updatedTransferData;
+                                                        },
+                                                      );
+                                                    }}
+                                                    disabled={
+                                                      group.courses.length <= 1
+                                                    }
+                                                  >
+                                                    <DeleteForeverIcon />
+                                                  </Button>
+                                                </TableCell>
+                                              </TableRow>
+                                            ))}
+                                          </TableBody>
+                                        </Table>
+                                        <Box
+                                          sx={{
+                                            display: "flex",
+                                            m: 2,
+                                            justifyContent: "flex-end",
+                                          }}
+                                        >
+                                          <Button
+                                            variant="contained"
+                                            onClick={(e) => {
+                                              e.stopPropagation(); // สำคัญมาก! กันไม่ให้ Accordion พับ/กาง ตอนกดปุ่ม
+
+                                              const newCourses = [
+                                                ...group.courses,
+                                                {
+                                                  id: "",
+                                                  name: "",
+                                                  credits: null,
+                                                  grade: "",
+                                                },
+                                              ];
+                                              setTransferData((prev) => {
+                                                const updatedTransferData = [
+                                                  ...prev,
+                                                ];
+                                                updatedTransferData[idx].groups[
+                                                  idx2
+                                                ].courses = newCourses;
+                                                return updatedTransferData;
+                                              });
+                                            }}
+                                          >
+                                            + วิชา
+                                          </Button>
+                                        </Box>
+                                      </TableContainer>
+                                    </CardContent>
+                                  </Card>
+                                </AccordionDetails>
+                              </Accordion>
+                            ))}
+                          </AccordionDetails>
+                        </Accordion>
+                      </>
                     );
                   })}
                 </Box>
