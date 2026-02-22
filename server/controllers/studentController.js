@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
+const { sendWelcomeMail } = require("./mailController");
 const prisma = new PrismaClient();
 
 exports.getStudents = async (req, res) => {
@@ -30,7 +31,7 @@ exports.createStudent = async (req, res) => {
       },
     });
 
-    sendWelcomeMail(user.email, user.username)
+    sendWelcomeMail(student.email, student.student_id)
       .then(() => console.log("Welcome email sent"))
       .catch((err) => console.error("Failed to send welcome email:", err));
 

@@ -94,6 +94,7 @@ model Subject {
 
 model AnnualCourse {
   id              Int                   @id @default(autoincrement())
+  name            String    @default("")
   year            Int
   term            Int
   startDate       DateTime
@@ -137,6 +138,7 @@ model StudentTransfer {
   annualCourseId Int
   transferData Json?    @default("[]")
   status         String
+  actives         Boolean               @default(true)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

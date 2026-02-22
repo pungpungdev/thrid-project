@@ -48,6 +48,7 @@ function CoursePage() {
   const [subjects, setSubjects] = useState([]);
   const [courses, setCourses] = useState([]);
   const [form, setForm] = useState({
+    name: "",
     year: "",
     term: "",
     startDate: null,
@@ -73,6 +74,7 @@ function CoursePage() {
   }, []);
 
   const requiredFields = [
+    "name",
     "year",
     "term",
     "startDate",
@@ -128,6 +130,7 @@ function CoursePage() {
     if (course) {
       fetchMajorsByFacultyId(course.facultyId);
       setForm({
+        name: course.name || "",
         year: course.year || "",
         term: course.term || "",
         startDate: dayjs(course.startDate) || null,
@@ -140,6 +143,7 @@ function CoursePage() {
       setEditId(course.id);
     } else {
       setForm({
+        name: "",
         year: "",
         term: "",
         startDate: null,
@@ -231,6 +235,7 @@ function CoursePage() {
   };
 
   const columns = [
+    { field: "name", headerName: "ชื่อหลักสูตร" },
     { field: "year", headerName: "ปีการศึกษา" },
     { field: "term", headerName: "ภาคเรียน" },
     {
@@ -377,6 +382,16 @@ function CoursePage() {
               gap: 2,
             }}
           >
+            <TextField
+              label="Name"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              fullWidth
+              margin="dense"
+              error={!!errors.name}
+              helperText={errors.name}
+            />
             <TextField
               label="Year"
               name="year"

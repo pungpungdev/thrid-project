@@ -17,6 +17,30 @@ export function useValidation(requiredFields = []) {
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateTransferData = (data) => {
+    const newErrors = {};
+    data.forEach((item, idx) => {
+      item.groups.forEach((group, idx2) => {
+        group.courses.forEach((course, idx3) => {
+          if (!course.id || course.id.toString().trim() === "") {
+            newErrors[`id${idx}-${idx2}-${idx3}`] = "This field is required";
+          }
+          if (!course.name || course.name.toString().trim() === "") {
+            newErrors[`name${idx}-${idx2}-${idx3}`] = "This field is required";
+          }
+          if (!course.credits || course.credits.toString().trim() === "") {
+            newErrors[`credits${idx}-${idx2}-${idx3}`] = "This field is required";
+          }
+          if (!course.grade || course.grade.toString().trim() === "") {
+            newErrors[`grade${idx}-${idx2}-${idx3}`] = "This field is required";
+          }
+        });
+      });
+    });
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const resetErrors = () => setErrors({});
-  return { errors, validate, resetErrors };
+  return { errors, validate, validateTransferData, resetErrors };
 }

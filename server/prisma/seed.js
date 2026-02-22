@@ -176,6 +176,7 @@ async function seedDatabase() {
   // Create Annual Course
   const annualCourse = await prisma.annualCourse.create({
     data: {
+      name: "หลักสูตรเทคโนโลยีสารสนเทศและธุรกิจดิจิทัล",
       year: 2567,
       term: 1,
       startDate: new Date("2024-06-01"),

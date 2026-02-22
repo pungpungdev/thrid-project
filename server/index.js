@@ -15,6 +15,7 @@ const mailRoutes = require("./routes/mailRoutes");
 const docRoutes = require("./routes/docRoutes");
 const summaryRoutes = require("./routes/summaryRoutes");
 const subGroupRoutes = require("./routes/subGroupRoutes");
+const studentTransferRoutes = require("./routes/studentTransferRoutes");
 
 app.use(express.json());
 app.use(
@@ -53,6 +54,7 @@ app.use("/api/mail", mailRoutes);
 app.use("/api/doc", docRoutes);
 app.use("/api/summary", summaryRoutes);
 app.use("/api/sub-groups", subGroupRoutes);
+app.use("/api/student-transfers", studentTransferRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
