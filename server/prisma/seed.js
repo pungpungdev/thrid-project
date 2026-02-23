@@ -199,7 +199,7 @@ async function seedDatabase() {
     {
       id: "5-155-302",
       name: "การฝึกงาน (Job Training)",
-      credits: "3(0-40-0)",
+      credits: "3",
       groups: [
         {
           groupId: 1,
@@ -208,6 +208,7 @@ async function seedDatabase() {
           ],
 
           selected: false,
+          isNotCE: false,
         },
         {
           groupId: 2,
@@ -215,6 +216,7 @@ async function seedDatabase() {
             { id: "30204-8001", name: "ฝึกงาน", credits: 4, grade: "4" },
           ],
           selected: true,
+          isNotCE: false,
         },
         {
           groupId: 3,
@@ -222,13 +224,14 @@ async function seedDatabase() {
             { id: "30901-8001", name: "ฝึกงาน", credits: 4, grade: "" },
           ],
           selected: false,
+          isNotCE: false,
         },
       ],
     },
     {
       id: "5-151-121",
       name: "การพัฒนาโปรแกรมคอมพิวเตอร์ (Computer Programming)",
-      credits: "3(0-6-3)",
+      credits: "3",
       groups: [
         {
           groupId: 1,
@@ -241,6 +244,7 @@ async function seedDatabase() {
             },
           ],
           selected: true,
+          isNotCE: false,
         },
         {
           groupId: 2,
@@ -253,6 +257,7 @@ async function seedDatabase() {
             },
           ],
           selected: false,
+          isNotCE: false,
         },
       ],
     }

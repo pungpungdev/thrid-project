@@ -66,6 +66,78 @@ button:focus-visible {
   }
 }
 
+/* CSS สำหรับ Custom Radio Button แบบ Checkbox Style */
+/* คลุมกลุ่มเลือก */
+.custom-radio-group {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* ปรับแต่ง Label ให้เป็นพื้นที่คลิก */
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  /*padding-left: 30px;*/
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ซ่อน Radio Button ของจริง */
+.container input {
+  /*position: absolute;*/
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* สร้างกล่องสี่เหลี่ยม (หน้าตาเหมือน Checkbox) */
+.checkmark {
+  position: absolute;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px; /* ปรับให้มนเล็กน้อยแบบ Checkbox */
+}
+
+/* เมื่อ Mouse Hover */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* เมื่อถูกเลือก (Checked) ให้เปลี่ยนสีพื้นหลัง */
+.container input:checked ~ .checkmark {
+  background-color: #2196f3;
+  border-color: #2196f3;
+}
+
+/* สร้างเครื่องหมายถูก (ตัวติ๊ก) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* แสดงเครื่องหมายถูกเมื่อ Checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* ปรับทรงเครื่องหมายถูก */
+.container .checkmark:after {
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+}
+
+/* CSS สำหรับการพิมพ์ (Print Styles) */
 @media print {
   /* ตั้งค่าหน้ากระดาษ A4 แนวตั้ง */
   @page {
@@ -97,21 +169,18 @@ button:focus-visible {
   background: white;
 }
 
-
-
-
 .course-comparison-table th {
-  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  font-family: "Sarabun", "TH Sarabun New", sans-serif;
   font-size: 12px;
 }
 .course-comparison-table td {
-  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  font-family: "Sarabun", "TH Sarabun New", sans-serif;
   font-size: 12px;
 }
 
 /* ส่วนหัวเอกสาร */
 .official-header {
-  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  font-family: "Sarabun", "TH Sarabun New", sans-serif;
   margin: 10px;
 }
 
@@ -186,7 +255,7 @@ button:focus-visible {
 /* ส่วนลายเซ็นและสรุปด้านล่าง */
 .official-footer {
   margin: 20px 10px 10px 10px;
-  font-family: 'Sarabun', 'TH Sarabun New', sans-serif;
+  font-family: "Sarabun", "TH Sarabun New", sans-serif;
   width: 100%;
 }
 

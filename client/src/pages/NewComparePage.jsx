@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import Sidebar from "../components/Sidebar";
+import { debounce } from "lodash";
 import {
   Box,
   Typography,
@@ -84,8 +84,6 @@ function NewComparePage() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [transferData, setTransferData] = useState([]);
 
-  const navigate = useNavigate();
-
   const handleChangeYear = (e) => {
     setSelectedYear(e.target.value);
     setSummary([]);
@@ -112,6 +110,7 @@ function NewComparePage() {
             courses: [{ id: "", name: "", credits: "", grade: "" }],
 
             selected: false,
+            isNotCE: false,
           },
         ],
       });
@@ -132,6 +131,7 @@ function NewComparePage() {
   };
 
   const [open, setOpen] = useState(false);
+  const [openSendSummary, setOpenSendSummary] = useState(false);
   const [form, setForm] = useState({
     studentId: "",
     annualCourseId: "",
@@ -185,6 +185,23 @@ function NewComparePage() {
   const { validate, validateTransferData, resetErrors, errors } =
     useValidation(requiredFields);
 
+  const handleOpenSendSummary = (transfer) => {
+    resetErrors();
+    if (transfer) {
+      setForm({
+        studentId: transfer.studentId || "",
+        annualCourseId: transfer.annualCourseId || "",
+        status: transfer.status || "DRAFT",
+      });
+      setTransferData(JSON.parse(transfer.transferData));
+      setSelectedCourse(
+        annualCourses.find((c) => c.id === transfer.annualCourseId),
+      );
+      setEditId(transfer.id);
+      setOpenSendSummary(true);
+    }
+  };
+
   const handleOpen = (transfer = null) => {
     resetErrors();
     if (transfer) {
@@ -194,7 +211,9 @@ function NewComparePage() {
         status: transfer.status || "DRAFT",
       });
       setTransferData(JSON.parse(transfer.transferData));
-      setSelectedCourse(annualCourses.find((c) => c.id === transfer.annualCourseId));
+      setSelectedCourse(
+        annualCourses.find((c) => c.id === transfer.annualCourseId),
+      );
       setEditId(transfer.id);
     } else {
       setForm({
@@ -208,6 +227,9 @@ function NewComparePage() {
     setOpen(true);
   };
 
+  const handleCloseSendSummary = () => {
+    setOpenSendSummary(false);
+  };
   const handleClose = () => {
     setOpen(false);
   };
@@ -260,6 +282,22 @@ function NewComparePage() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
+  const newData = [...transferData];
+  
+  if (key === 'selected') {
+    // สำหรับ Radio: วนลูปให้กลุ่มอื่นในวิชาเดียวกันเป็น false ให้หมดก่อน
+    newData[subjectIdx].groups.forEach((g, i) => {
+      newData[subjectIdx].groups[i].selected = (i === groupIdx);
+    });
+  } else {
+    // สำหรับ Checkbox: เปลี่ยนค่าเฉพาะกลุ่มนั้นๆ
+    newData[subjectIdx].groups[groupIdx][key] = value;
+  }
+
+  setTransferData(newData);
+};
+
   const handleSubmit = async () => {
     resetErrors();
     if (/* !validateTransferData(transferData) || */ !validate(form)) return;
@@ -287,6 +325,33 @@ function NewComparePage() {
       }
       fetchStudentTransfers();
       handleClose();
+    } catch (error) {
+      setAlert({
+        open: true,
+        message:
+          error.response?.data?.error || error.message || "Error occurred",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleSubmitSendSummary = async () => {
+    resetErrors();
+    try {
+      if (editId) {
+        await updateStudentTransfer(editId, {
+          ...form,
+          status: "WAITING_FOR_APPROVAL",
+          transferData: JSON.stringify(transferData),
+        });
+        setAlert({
+          open: true,
+          message: "Student transfer updated successfully!",
+          severity: "success",
+        });
+      }
+      fetchStudentTransfers();
+      handleCloseSendSummary();
     } catch (error) {
       setAlert({
         open: true,
@@ -343,6 +408,20 @@ function NewComparePage() {
     setActiveTab(newValue);
   };
 
+  const currentCourse = annualCourses.find((c) => c.id === form.annualCourseId);
+  const courseYear = currentCourse ? currentCourse.year : "ไม่พบข้อมูล";
+  const courseTerm = currentCourse ? currentCourse.term : "ไม่พบข้อมูล";
+  const courseName = currentCourse ? currentCourse.name : "ไม่พบข้อมูล";
+  const courseFaculty = currentCourse?.faculty?.name || "ไม่พบข้อมูล";
+  const courseMajor = currentCourse?.major?.name || "ไม่พบข้อมูล";
+
+  const currentStudent = students.find((s) => s.id === form.studentId);
+  const studentFullName = currentStudent
+    ? `${currentStudent.title_th} ${currentStudent.firstname_th} ${currentStudent.lastname_th}`
+    : "ไม่พบข้อมูล";
+  const studentFaculty = currentStudent?.faculty?.name || "ไม่พบข้อมูล";
+  const studentMajor = currentStudent?.major?.name || "ไม่พบข้อมูล";
+
   const rows = studentTransfers.map((transfer) => ({
     ...transfer,
     courseName:
@@ -378,6 +457,14 @@ function NewComparePage() {
             onClick={() => handleOpen(transfer)}
           >
             <EditIcon />
+          </Button>
+          <Button
+            variant="contained"
+            size="small"
+            color="success"
+            onClick={() => handleOpenSendSummary(transfer)}
+          >
+            ส่งสรุปผล
           </Button>
           <Button
             variant="contained"
@@ -614,7 +701,7 @@ function NewComparePage() {
                   </Dialog>
                 </Box>
               )}
-              {(editId || selectedCourse) && (
+              {((editId && selectedCourse) || selectedCourse) && (
                 <Box
                   component="main"
                   sx={{
@@ -631,7 +718,16 @@ function NewComparePage() {
                     mb={3}
                     align="center"
                   >
-                    เปรียบเทียบรายวิชา (ปี {selectedCourse.year || ""})
+                    ใบเปรียบเทียบรายวิชา (ปี {courseYear} ภาคเรียนที่{" "}
+                    {courseTerm})
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    mb={3}
+                    align="center"
+                    fontWeight="normal"
+                  >
+                    {courseName}
                   </Typography>
                   <Typography
                     variant="h6"
@@ -639,11 +735,7 @@ function NewComparePage() {
                     align="center"
                     fontWeight="normal"
                   >
-                    {selectedCourse?.name +
-                      " คณะ" +
-                      selectedCourse?.faculty?.name +
-                      " สาขา" +
-                      selectedCourse?.major?.name}
+                    {"คณะ " + courseFaculty + " สาขา " + courseMajor}
                   </Typography>
 
                   <FormControl fullWidth margin="dense">
@@ -714,6 +806,7 @@ function NewComparePage() {
                                     ],
 
                                     selected: false,
+                                    isNotCE: false,
                                   },
                                 ];
                                 setTransferData((prev) => {
@@ -1036,6 +1129,214 @@ function NewComparePage() {
               <Button onClick={handleClose}>Cancel</Button>
               <Button onClick={handleSubmit} variant="contained">
                 {editId ? "Update" : "Create"}
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Dialog
+            open={openSendSummary}
+            onClose={handleCloseSendSummary}
+            fullWidth
+            maxWidth="lg"
+          >
+            <DialogTitle>{`ส่งข้อมูลไปที่สรุปผลการเทียบ`}</DialogTitle>
+            <DialogContent>
+              {editId && selectedCourse && (
+                <Box
+                  component="main"
+                  sx={{
+                    flexGrow: 1,
+                    p: 4,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                  }}
+                >
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    mb={3}
+                    align="center"
+                  >
+                    ใบเปรียบเทียบรายวิชา (ปี {courseYear} ภาคเรียนที่{" "}
+                    {courseTerm})
+                  </Typography>
+                  <Typography
+                    variant="h5"
+                    mb={3}
+                    align="center"
+                    fontWeight="normal"
+                  >
+                    {courseName}
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    mb={3}
+                    align="center"
+                    fontWeight="normal"
+                  >
+                    {"คณะ " + courseFaculty + " สาขา " + courseMajor}
+                  </Typography>
+                  <Divider sx={{ width: "100%", mb: 3, borderColor: "#000" }} />
+                  <Box
+                    sx={{
+                      width: "100%",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 3,
+                    }}
+                  >
+                    <Box sx={{ width: "100%" }}>
+                      <Typography
+                        variant="h6"
+                        mb={3}
+                        align="left"
+                        fontWeight="normal"
+                      >
+                        {"ชื่อ-สกุล " + studentFullName}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ width: "100%" }}>
+                      <Typography
+                        variant="h6"
+                        mb={3}
+                        align="left"
+                        fontWeight="normal"
+                      >
+                        {"คณะ " + studentFaculty + " สาขา " + studentMajor}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  {/* --- CONTENT ส่วนตาราง --- */}
+                  <div style={{ fontFamily: "sans-serif" }}>
+                    <table
+                      border="1"
+                      style={{
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        textAlign: "center",
+                      }}
+                    >
+                      <thead>
+                        <tr style={{ backgroundColor: "#f2f2f2" }}>
+                          <th rowSpan="2">รหัสวิชา</th>
+                          <th rowSpan="2">ชื่อวิชา</th>
+                          <th rowSpan="2">หน่วยกิต</th>
+                          <th rowSpan="2">กลุ่มเทียบ</th>
+                          <th colSpan="3">
+                            รายวิชาที่ขอเทียบโอน (จะต้องได้เกรด C หรือ 2 ขึ้นไป)
+                          </th>
+                          <th rowSpan="2">เกรด</th>
+                          <th rowSpan="2">เลือก (✓)</th>
+                          <th rowSpan="2">นอกระบบ CE</th>
+                        </tr>
+                        <tr style={{ backgroundColor: "#f2f2f2" }}>
+                          <th>รหัสวิชา</th>
+                          <th>ชื่อวิชา</th>
+                          <th>หน่วยกิต</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {transferData.map((mainCourse, mIdx) => {
+                          // คำนวณ total rows ของวิชาหลักนี้
+                          const totalRowsInMain = mainCourse.groups.reduce(
+                            (acc, g) => acc + g.courses.length,
+                            0,
+                          );
+
+                          return mainCourse.groups.map((group, gIdx) => {
+                            return group.courses.map((subCourse, sIdx) => {
+                              const isFirstRowOfMain = gIdx === 0 && sIdx === 0;
+                              const isFirstRowOfGroup = sIdx === 0;
+
+                              return (
+                                <tr key={`${mainCourse.id}-${gIdx}-${sIdx}`}>
+                                  {/* Render ข้อมูลวิชาหลักเฉพาะแถวแรกสุด */}
+                                  {isFirstRowOfMain && (
+                                    <>
+                                      <td rowSpan={totalRowsInMain}>
+                                        {mainCourse.id}
+                                      </td>
+                                      <td
+                                        rowSpan={totalRowsInMain}
+                                        style={{
+                                          textAlign: "left",
+                                          paddingLeft: "5px",
+                                        }}
+                                      >
+                                        {mainCourse.name}
+                                      </td>
+                                      <td rowSpan={totalRowsInMain}>
+                                        {mainCourse.credits}
+                                      </td>
+                                    </>
+                                  )}
+
+                                  {/* Render กลุ่มเทียบเฉพาะแถวแรกของกลุ่ม */}
+                                  {isFirstRowOfGroup && (
+                                    <td rowSpan={group.courses.length}>
+                                      {group.groupId}
+                                    </td>
+                                  )}
+
+                                  {/* ข้อมูลวิชาย่อย (แสดงทุกแถว) */}
+                                  <td>{subCourse.id}</td>
+                                  <td
+                                    style={{
+                                      textAlign: "left",
+                                      paddingLeft: "5px",
+                                    }}
+                                  >
+                                    {subCourse.name}
+                                  </td>
+                                  <td>{subCourse.credits}</td>
+                                  <td>{subCourse.grade}</td>
+                                  {/* ข้อมูลเกรดและการเลือก เฉพาะแถวแรกของกลุ่ม */}
+                                  {isFirstRowOfGroup && (
+                                    <>
+                                      <td rowSpan={group.courses.length}>
+                                        <div className="custom-radio-group">
+                                          <label className="container">
+                                            <input
+                                              type="radio"
+                                              name={`selected-${mainCourse.id}`}
+                                              checked={group.selected || false}
+                                              onChange={() => handleRadioChange(mIdx, gIdx, 'selected', true)}
+                                            />
+                                            <span className="checkmark"></span>
+                                          </label>
+                                        </div>
+                                      </td>
+                                      <td rowSpan={group.courses.length}>
+                                        <div className="custom-radio-group">
+                                          <label className="container">
+                                            <input
+                                              type="checkbox"
+                                              name={`isNotCE-${mainCourse.id}-${group.groupId}`}
+                                              checked={group.isNotCE || false}
+                                              onChange={(e) => handleRadioChange(mIdx, gIdx, 'isNotCE', e.target.checked)}
+                                            />
+                                            <span className="checkmark"></span>
+                                          </label>
+                                        </div>
+                                      </td>
+                                    </>
+                                  )}
+                                </tr>
+                              );
+                            });
+                          });
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </Box>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseSendSummary}>Cancel</Button>
+              <Button onClick={handleSubmitSendSummary} variant="contained">
+                {"ส่งข้อมูล"}
               </Button>
             </DialogActions>
           </Dialog>

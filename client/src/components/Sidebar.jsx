@@ -75,11 +75,11 @@ function Sidebar() {
           </ListItemIcon>
           <ListItemText primary="รายงานเเต่ละปี" />
         </ListItem>
-        <ListItem button component={Link} to="/preview">
+        <ListItem button component={Link} to="/newSummary">
           <ListItemIcon sx={{ color: "#fff" }}>
             <BallotIcon />
           </ListItemIcon>
-          <ListItemText primary="สรุปผล" />
+          <ListItemText primary="สรุปผลการเทียบโอน" />
         </ListItem>
         <ListItem button component={Link} to="/newCompare">
           <ListItemIcon sx={{ color: "#fff" }}>
