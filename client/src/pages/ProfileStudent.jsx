@@ -1,29 +1,71 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import api from "../api/axios";
 import Sidebar from "../components/Sidebar";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Card,
+  CardContent,
+  Avatar,
+  Divider,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { getStudent, updateStudent } from "../services/studentService";
+import { useValidation } from "../hooks/useValidation";
+import { getFaculties } from "../services/facultyService";
+import { getMajorsByFacultyId } from "../services/majorService";
 
 function ProfileStudent() {
   const { user, role } = useAuth();
   const [student, setStudent] = useState(null);
+  const [faculties, setFaculties] = useState([]);
+  const [majors, setMajors] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({});
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
 
-  useEffect(() => {
-    if (role === "Student" && user?.id) {
-      api.get(`/students/${user.id}`).then((res) => {
-        setStudent(res.data);
-        setForm(res.data);
-      });
-    }
-  }, [user, role]);
+  const requiredFields = ["telephone", "email", "faculties_id", "majors_id"];
+  const { errors, validate, resetErrors } = useValidation(requiredFields);
+
+  const fetchStudent = async () => {
+    const res = await getStudent(user.id);
+    console.log("Fetched student:", res.data);
+    setStudent(res.data);
+    setForm(res.data);
+    fetchFaculties();
+    fetchMajorsByFacultyId(res.data.faculties_id);
+  };
+  const fetchFaculties = async () => {
+    const res = await getFaculties();
+    setFaculties(res.data);
+  };
+  const fetchMajorsByFacultyId = async (facultyId) => {
+    const res = await getMajorsByFacultyId(facultyId);
+    console.log("Fetched majors:", res.data);
+    setMajors(res.data);
+  };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    console.log(e.target.name, e.target.value);
+    if (e.target.name === "faculties_id") {
+      fetchMajorsByFacultyId(e.target.value);
+      setForm({ ...form, [e.target.name]: e.target.value, majors_id: "" });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
+
+  useEffect(() => {
+    if (role === "Student" && user?.id) {
+      fetchStudent();
+    }
+  }, []);
 
   const handleEdit = () => {
     setEditMode(true);
@@ -38,9 +80,13 @@ function ProfileStudent() {
   };
 
   const handleSave = async () => {
+    resetErrors();
+    console.log(validate(form));
+    console.log(errors)
+    if (!validate(form)) return;
     setLoading(true);
     try {
-      const res = await api.put(`/students/${student.id}`, form);
+      const res = await updateStudent(student.id, form);
       setStudent(res.data);
       setEditMode(false);
       setSuccessMsg("บันทึกข้อมูลสำเร็จ!");
@@ -105,22 +151,28 @@ function ProfileStudent() {
               }}
             >
               <TextField
-                label="อีเมล"
-                name="email"
-                value={form.email || ""}
-                onChange={handleChange}
-                disabled={!editMode}
-                fullWidth
-              />
-              <TextField
-                label="เบอร์โทรศัพท์"
+                margin="dense"
+                label="Telephone"
                 name="telephone"
-                value={form.telephone || ""}
+                value={form.telephone}
                 onChange={handleChange}
                 disabled={!editMode}
                 fullWidth
+                error={!!errors.telephone}
+                helperText={errors.telephone}
               />
               <TextField
+                margin="dense"
+                label="Email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                disabled={!editMode}
+                fullWidth
+                error={!!errors.email}
+                helperText={errors.email}
+              />
+              {/* <TextField
                 label="วุฒิการศึกษา"
                 name="certificate"
                 value={form.certificate || ""}
@@ -138,13 +190,13 @@ function ProfileStudent() {
               />
               <TextField
                 label="คณะ"
-                value={student.faculty?.name || "-"}
+                value={form.faculties_id || "-"}
                 disabled
                 fullWidth
               />
               <TextField
                 label="สาขา"
-                value={student.major?.name || "-"}
+                value={form.majors_id || "-"}
                 disabled
                 fullWidth
               />
@@ -153,7 +205,51 @@ function ProfileStudent() {
                 value={student.actives ? "กำลังศึกษา" : "ไม่ใช้งาน"}
                 disabled
                 fullWidth
-              />
+              /> */}
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="faculty-label">Faculty</InputLabel>
+                <Select
+                  labelId="faculty-label"
+                  id="faculties_id"
+                  label="Faculty"
+                  name="faculties_id"
+                  value={form.faculties_id}
+                  onChange={handleChange}
+                  disabled={!editMode}
+                  error={!!errors.faculties_id}
+                  helperText={errors.faculties_id}
+                >
+                  {faculties.map((faculty) => (
+                    <MenuItem key={faculty.id} value={faculty.id}>
+                      {faculty.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth margin="dense">
+                <InputLabel id="major-label">Major</InputLabel>
+                <Select
+                  labelId="major-label"
+                  id="majors_id"
+                  label="Major"
+                  name="majors_id"
+                  value={form.majors_id}
+                  onChange={handleChange}
+                  disabled={!editMode}
+                  error={!!errors.majors_id}
+                  helperText={errors.majors_id}
+                >
+                  {majors
+                    .filter(
+                      (major) => major.faculty_id === Number(form.faculties_id),
+                    )
+                    .map((major) => (
+                      <MenuItem key={major.id} value={major.id}>
+                        {major.name}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
             </Box>
             <Box
               sx={{

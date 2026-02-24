@@ -33,7 +33,7 @@ async function seedDatabase() {
   // Create Student
   const student = await prisma.student.create({
     data: {
-      student_id: "676051000065-8",
+      student_id: "676051000065",
       password: await bcrypt.hash("password123", 10),
       title_th: "นาย",
       firstname_th: "อานนท์",

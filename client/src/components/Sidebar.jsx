@@ -75,18 +75,22 @@ function Sidebar() {
           </ListItemIcon>
           <ListItemText primary="รายงานเเต่ละปี" />
         </ListItem>
-        <ListItem button component={Link} to="/newSummary">
-          <ListItemIcon sx={{ color: "#fff" }}>
-            <BallotIcon />
-          </ListItemIcon>
-          <ListItemText primary="สรุปผลการเทียบโอน" />
-        </ListItem>
-        <ListItem button component={Link} to="/newCompare">
-          <ListItemIcon sx={{ color: "#fff" }}>
-            <CompareArrowsIcon />
-          </ListItemIcon>
-          <ListItemText primary="เทียบรายวิชา" />
-        </ListItem>
+        {role !== "Student" && (
+          <ListItem button component={Link} to="/newSummary">
+            <ListItemIcon sx={{ color: "#fff" }}>
+              <BallotIcon />
+            </ListItemIcon>
+            <ListItemText primary="สรุปผลการเทียบโอน" />
+          </ListItem>
+        )}
+        {role !== "Student" && (
+          <ListItem button component={Link} to="/newCompare">
+            <ListItemIcon sx={{ color: "#fff" }}>
+              <CompareArrowsIcon />
+            </ListItemIcon>
+            <ListItemText primary="เทียบรายวิชา" />
+          </ListItem>
+        )}
         {role === "Student" && (
           <ListItem button component={Link} to="/profileStudent">
             <ListItemIcon sx={{ color: "#fff" }}>
