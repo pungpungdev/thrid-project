@@ -155,4 +155,6 @@ router.put('/:id', studentController.updateStudent);
  */
 router.delete('/:id', studentController.softDeleteStudent);
 
+router.post('/import', studentController.bulkStudents);
+
 module.exports = router;

@@ -59,7 +59,7 @@ function StudentPage() {
   const [students, setStudents] = useState([]);
   const [faculties, setFaculties] = useState([]);
   const [majors, setMajors] = useState([]);
-  //const [allMajors, setAllMajors] = useState([]);
+  const [allMajors, setAllMajors] = useState([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     student_id: "",
@@ -104,10 +104,10 @@ function StudentPage() {
     const res = await getFaculties();
     setFaculties(res.data);
   };
-  /* const fetchMajors = async () => {
+  const fetchMajors = async () => {
     const res = await getMajors();
     setAllMajors(res.data);
-  }; */
+  };
   const fetchMajorsByFacultyId = async (facultyId) => {
     const res = await getMajorsByFacultyId(facultyId);
     console.log("Fetched majors:", res.data);
@@ -117,7 +117,7 @@ function StudentPage() {
   useEffect(() => {
     fetchStudents();
     fetchFaculties();
-    //fetchMajors();
+    fetchMajors();
   }, []);
 
   const handleOpen = (student = null) => {
@@ -216,12 +216,13 @@ function StudentPage() {
     // Prepare data for export
     const exportData = students.map((student) => ({
       "Student Id": student.student_id,
+      "Title": student.title_th,
       "First Name": student.firstname_th,
       "Last Name": student.lastname_th,
-      Email: student.email,
-      Faculty: student.faculty?.name || "",
-      Major: student.major?.name || "",
-      Telephone: student.telephone,
+      "Email": student.email,
+      "Faculty": student.faculty?.name || "",
+      "Major": student.major?.name || "",
+      "Telephone": student.telephone,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -237,16 +238,30 @@ function StudentPage() {
     const workbook = XLSX.read(data);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(worksheet);
-    console.log("Imported JSON:", json);
     // You may want to map/validate json before sending to backend
     // Example: await studentService.importStudents(json);
     // For demo, just log and show alert
-    // await studentService.importStudents(json); // <-- implement this API if needed
+    const importData = json.map((item) => ({
+      student_id: item["Student Id"] || "",
+      title_th: item["Title"] || "",
+      firstname_th: item["First Name"] || "",
+      lastname_th: item["Last Name"] || "",
+      email: item["Email"] || "",
+      faculties_id: faculties.find((f) => f.name === item["Faculty"])?.id || null,
+      majors_id: allMajors.find((m) => m.name === item["Major"])?.id || null,
+      telephone: item["Telephone"] || "",
+      password: "password123",
+      actives: true,
+    }));
+    console.log("Imported JSON:", importData);
+
+    await studentService.importStudents(importData); // <-- implement this API if needed
     setAlert({
       open: true,
       severity: "success",
-      message: `Imported ${json.length} students from Excel (implement backend to save).`,
+      message: `Imported ${importData.length} students from Excel (implement backend to save).`,
     });
+    e.target.value = null;
     fetchStudents();
   };
 

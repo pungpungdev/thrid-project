@@ -73,15 +73,31 @@ exports.softDeleteStudent = async (req, res) => {
 exports.bulkStudents = async (req, res) => {
   const students = req.body;
   try {
-    const createdStudents = await prisma.student.createMany({
+    /* const createdStudents = await prisma.student.createMany({
       data: students.map((student) => ({
         ...student,
         password: bcrypt.hashSync(student.password, 10),
       })),
-    });
+    }); */
+
+    const excelData = students.map((student) => ({
+      ...student,
+      password: bcrypt.hashSync(student.password, 10),
+    }));
+    // 2. ใช้ Transaction เพื่อความเร็วและความถูกต้อง (All or Nothing)
+    // การใช้ map เพื่อสร้าง Array ของ Promise และใช้ $transaction จัดการ
+    const operations = excelData.map((student) =>
+      prisma.student.upsert({
+        where: { student_id: student.student_id },
+        update: { ...student }, // ถ้าซ้ำให้เขียนทับด้วยข้อมูลใหม่จาก Excel
+        create: { ...student }, // ถ้าไม่ซ้ำให้สร้างใหม่
+      }),
+    );
+
+    const results = await prisma.$transaction(operations);
     res
       .status(201)
-      .json({ message: "Students imported", count: createdStudents.count });
+      .json({ message: "Students imported", count: results.length });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
