@@ -309,7 +309,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
         });
         setAlert({
           open: true,
-          message: "Student transfer updated successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       } else {
@@ -319,7 +319,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
         });
         setAlert({
           open: true,
-          message: "Student transfer created successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       }
@@ -346,7 +346,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
         });
         setAlert({
           open: true,
-          message: "Student transfer updated successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       }
@@ -369,7 +369,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
       fetchInactiveStudentTransfers();
       setAlert({
         open: true,
-        message: "Student transfer deleted successfully!",
+        message: "ลบสำเร็จ",
         severity: "success",
       });
     } catch (error) {
@@ -389,7 +389,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
       fetchInactiveStudentTransfers();
       setAlert({
         open: true,
-        message: "Student transfer restored successfully!",
+        message: "กู้คืนสำเร็จ",
         severity: "success",
       });
     } catch (error) {
@@ -1126,9 +1126,9 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
               )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>ยกเลิก</Button>
               <Button onClick={handleSubmit} variant="contained">
-                {editId ? "Update" : "Create"}
+                {editId ? "บันทึก" : "บันทึก"}
               </Button>
             </DialogActions>
           </Dialog>
@@ -1334,7 +1334,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
               )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleCloseSendSummary}>Cancel</Button>
+              <Button onClick={handleCloseSendSummary}>ยกเลิก</Button>
               <Button onClick={handleSubmitSendSummary} variant="contained">
                 {"ส่งข้อมูล"}
               </Button>

@@ -139,6 +139,7 @@ function DefaultTable({ columns, rows }) {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               ActionsComponent={TablePaginationActions}
+              labelRowsPerPage="จำนวนแถวต่อหน้า:"
             />
           </TableRow>
         </TableFooter>

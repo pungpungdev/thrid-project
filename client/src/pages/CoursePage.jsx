@@ -359,7 +359,7 @@ function CoursePage() {
             จัดการหลักสูตรประจำปี
           </Typography>
           <Button variant="contained" onClick={() => handleOpen()}>
-            Add Annual Course
+            เพิ่มหลักสูตร
           </Button>
         </Box>
 
@@ -373,7 +373,7 @@ function CoursePage() {
             setEditId(null);
           }}
         >
-          <DialogTitle>{editId ? "Edit" : "Create"} Annual Course</DialogTitle>
+          <DialogTitle>{editId ? "แก้ไข" : "เพิ่ม"}หลักสูตร</DialogTitle>
           <DialogContent
             sx={{
               minWidth: 400,
@@ -383,7 +383,7 @@ function CoursePage() {
             }}
           >
             <TextField
-              label="Name"
+              label="ชื่อหลักสูตร"
               name="name"
               value={form.name}
               onChange={handleChange}
@@ -393,7 +393,7 @@ function CoursePage() {
               helperText={errors.name}
             />
             <TextField
-              label="Year"
+              label="ปีการศึกษา"
               name="year"
               value={form.year}
               onChange={handleChange}
@@ -403,7 +403,7 @@ function CoursePage() {
               helperText={errors.year}
             />
             <TextField
-              label="Term"
+              label="ภาคเรียน"
               name="term"
               value={form.term}
               onChange={handleChange}
@@ -414,7 +414,7 @@ function CoursePage() {
             />
             <DatePicker
               name="startDate"
-              label="Start Date"
+              label="วันที่เริ่มต้น"
               value={form.startDate}
               onChange={(newValue) =>
                 handleChange({ target: { name: "startDate", value: newValue } })
@@ -429,7 +429,7 @@ function CoursePage() {
             />
             <DatePicker
               name="endDate"
-              label="End Date"
+              label="วันที่สิ้นสุด"
               value={form.endDate}
               onChange={(newValue) =>
                 handleChange({ target: { name: "endDate", value: newValue } })
@@ -443,12 +443,12 @@ function CoursePage() {
               }}
             />
             <FormControl fullWidth margin="dense">
-              <InputLabel>Faculty</InputLabel>
+              <InputLabel>คณะ</InputLabel>
               <Select
                 name="facultyId"
                 value={form.facultyId}
                 onChange={handleChange}
-                label="Faculty"
+                label="คณะ"
                 error={!!errors.facultyId}
                 helperText={errors.facultyId}
               >
@@ -460,12 +460,12 @@ function CoursePage() {
               </Select>
             </FormControl>
             <FormControl fullWidth margin="dense">
-              <InputLabel>Major</InputLabel>
+              <InputLabel>สาขา</InputLabel>
               <Select
                 name="majorId"
                 value={form.majorId}
                 onChange={handleChange}
-                label="Major"
+                label="สาขา"
                 error={!!errors.majorId}
                 helperText={errors.majorId}
               >
@@ -479,7 +479,7 @@ function CoursePage() {
               </Select>
             </FormControl>
             <FormControl fullWidth margin="dense">
-              <InputLabel>Subjects</InputLabel>
+              <InputLabel>รายชื่อวิชา</InputLabel>
               <Select
                 multiple
                 name="subjectIds"
@@ -511,10 +511,10 @@ function CoursePage() {
                 setEditId(null);
               }}
             >
-              Cancel
+              ยกเลิก
             </Button>
             <Button onClick={handleSubmit} variant="contained">
-              {editId ? "Update" : "Create"}
+              {editId ? "บันทึก" : "บันทึก"}
             </Button>
           </DialogActions>
         </Dialog>
@@ -524,7 +524,7 @@ function CoursePage() {
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>Subjects </DialogTitle>
+          <DialogTitle>รายชื่อวิชา</DialogTitle>
           <DialogContent>
             {selectedSubjects.length > 0 ? (
               <TableContainer component={Paper} sx={{ boxShadow: 0 }}>
@@ -532,9 +532,9 @@ function CoursePage() {
                   <TableHead>
                     <TableRow>
                       <TableCell align="center" width={80}>
-                        No.
+                        ลำดับ
                       </TableCell>
-                      <TableCell>Subject Name</TableCell>
+                      <TableCell>รายชื่อวิชา</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -549,7 +549,7 @@ function CoursePage() {
               </TableContainer>
             ) : (
               <Typography color="text.secondary" sx={{ mt: 2 }}>
-                No subjects
+                ไม่มีวิชา
               </Typography>
             )}
           </DialogContent>
@@ -559,7 +559,7 @@ function CoursePage() {
               onClick={() => setSubjectDialogOpen(false)}
               color="primary"
             >
-              Close
+              ปิด
             </Button>
           </DialogActions>
         </Dialog>

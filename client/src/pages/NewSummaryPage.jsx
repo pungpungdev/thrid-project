@@ -160,7 +160,7 @@ function NewSummaryPage() {
         });
         setAlert({
           open: true,
-          message: "Student transfer updated successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       }
@@ -473,7 +473,7 @@ function NewSummaryPage() {
               )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleCloseSummary}>Cancel</Button>
+              <Button onClick={handleCloseSummary}>ยกเลิก</Button>
               <Button onClick={handleSubmitSummary} variant="contained">
                 {"อนุมัติผลการเทียบโอน"}
               </Button>

@@ -81,14 +81,14 @@ export default function FacultyPage() {
         await updateFaculty(editId, form);
         setAlert({
           open: true,
-          message: "Faculty updated successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       } else {
         await createFaculty(form);
         setAlert({
           open: true,
-          message: "Faculty created successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       }
@@ -109,7 +109,7 @@ export default function FacultyPage() {
       fetchFaculties();
       setAlert({
         open: true,
-        message: "Faculty deleted successfully!",
+        message: "ลบสำเร็จ",
         severity: "success",
       });
     } catch (error) {
@@ -161,14 +161,14 @@ export default function FacultyPage() {
               คณะ
             </Typography>
             <Button variant="contained" onClick={() => handleOpen()}>
-              Add Faculty
+              เพิ่มข้อมูลคณะ
             </Button>
           </Box>
 
           <DefaultTable columns={columns} rows={rows} />
 
           <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{editId ? "Edit Faculty" : "Add Faculty"}</DialogTitle>
+            <DialogTitle>{editId ? "แก้ไขรายชื่อคณะ" : "เพิ่มข้อมูลคณะ"}</DialogTitle>
             <DialogContent>
               <Box
                 sx={{
@@ -181,7 +181,7 @@ export default function FacultyPage() {
               >
                 <TextField
                   margin="dense"
-                  label="Faculty Name"
+                  label="ชื่อคณะ"
                   name="name"
                   value={form.name}
                   onChange={handleChange}
@@ -192,9 +192,9 @@ export default function FacultyPage() {
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>ยกเลิก</Button>
               <Button onClick={handleSubmit} variant="contained">
-                {editId ? "Update" : "Create"}
+                {editId ? "บันทึก" : "บันทึก"}
               </Button>
             </DialogActions>
           </Dialog>

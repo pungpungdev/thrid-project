@@ -180,14 +180,14 @@ function StudentPage() {
         setAlert({
           open: true,
           severity: "success",
-          message: "Student updated successfully!",
+          message: "บันทึกสำเร็จ",
         });
       } else {
         await studentService.createStudent(form);
         setAlert({
           open: true,
           severity: "success",
-          message: "Student created successfully!",
+          message: "บันทึกสำเร็จ",
         });
       }
       fetchStudents();
@@ -204,7 +204,7 @@ function StudentPage() {
       setAlert({
         open: true,
         severity: "success",
-        message: "Student deleted successfully!",
+        message: "ลบสำเร็จ",
       });
     } catch (error) {
       setAlert({ open: true, severity: "error", message: "Operation failed!" });
@@ -242,14 +242,14 @@ function StudentPage() {
     // Example: await studentService.importStudents(json);
     // For demo, just log and show alert
     const importData = json.map((item) => ({
-      student_id: item["Student Id"] || "",
-      title_th: item["Title"] || "",
-      firstname_th: item["First Name"] || "",
-      lastname_th: item["Last Name"] || "",
-      email: item["Email"] || "",
+      student_id: String(item["Student Id"]) || "",
+      title_th: String(item["Title"]) || "",
+      firstname_th: String(item["First Name"]) || "",
+      lastname_th: String(item["Last Name"]) || "",
+      email: String(item["Email"]) || "",
       faculties_id: faculties.find((f) => f.name === item["Faculty"])?.id || null,
       majors_id: allMajors.find((m) => m.name === item["Major"])?.id || null,
-      telephone: item["Telephone"] || "",
+      telephone: String(item["Telephone"]) || "",
       password: "password123",
       actives: true,
     }));
@@ -259,7 +259,7 @@ function StudentPage() {
     setAlert({
       open: true,
       severity: "success",
-      message: `Imported ${importData.length} students from Excel (implement backend to save).`,
+      message: `Import สำเร็จ`,
     });
     e.target.value = null;
     fetchStudents();
@@ -311,7 +311,7 @@ function StudentPage() {
               onClick={() => handleOpen()}
               sx={{ mr: 2 }}
             >
-              Add Student
+              เพิ่มรายชื่อนักศึกษา
             </Button>
             {/* Export Button */}
             <Button
@@ -347,7 +347,7 @@ function StudentPage() {
         <DefaultTable columns={columns} rows={rows} />
 
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{editId ? "Edit Student" : "Add Student"}</DialogTitle>
+          <DialogTitle>{editId ? "แก้ไขรายชื่อนักศึกษา" : "เพิ่มรายชื่อนักศึกษา"}</DialogTitle>
           <DialogContent>
             <Box
               component="form"
@@ -372,7 +372,7 @@ function StudentPage() {
               >
                 <TextField
                   margin="dense"
-                  label="Student ID"
+                  label="รหัสนักศึกษา"
                   name="student_id"
                   value={form.student_id}
                   onChange={handleChange}
@@ -382,7 +382,7 @@ function StudentPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Title (TH)"
+                  label="คำนำหน้า"
                   name="title_th"
                   value={form.title_th}
                   onChange={handleChange}
@@ -392,7 +392,7 @@ function StudentPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="First Name"
+                  label="ชื่อ"
                   name="firstname_th"
                   value={form.firstname_th}
                   onChange={handleChange}
@@ -402,7 +402,7 @@ function StudentPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Last Name"
+                  label="นามสกุล"
                   name="lastname_th"
                   value={form.lastname_th}
                   onChange={handleChange}
@@ -412,7 +412,7 @@ function StudentPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Telephone"
+                  label="หมายเลขโทรศัพท์"
                   name="telephone"
                   value={form.telephone}
                   onChange={handleChange}
@@ -422,7 +422,7 @@ function StudentPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Email"
+                  label="อีเมล์"
                   name="email"
                   value={form.email}
                   onChange={handleChange}
@@ -440,11 +440,11 @@ function StudentPage() {
                 }}
               >
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="faculty-label">Faculty</InputLabel>
+                  <InputLabel id="faculty-label">คณะ</InputLabel>
                   <Select
                     labelId="faculty-label"
                     id="faculties_id"
-                    label="Faculty"
+                    label="คณะ"
                     name="faculties_id"
                     value={form.faculties_id}
                     onChange={handleChange}
@@ -459,11 +459,11 @@ function StudentPage() {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="major-label">Major</InputLabel>
+                  <InputLabel id="major-label">สาขา</InputLabel>
                   <Select
                     labelId="major-label"
                     id="majors_id"
-                    label="Major"
+                    label="สาขา"
                     name="majors_id"
                     value={form.majors_id}
                     onChange={handleChange}
@@ -483,7 +483,7 @@ function StudentPage() {
                   </Select>
                 </FormControl>
                 <Button variant="outlined" component="label" sx={{ mt: 1 }}>
-                  Upload Profile Image
+                  เพิ่มรูปภาพ
                   <input
                     type="file"
                     accept="image/*"
@@ -519,13 +519,13 @@ function StudentPage() {
             </Box>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleClose}>ยกเลิก</Button>
             <Button
               onClick={handleSubmit}
               variant="contained"
               disabled={!!studentIdError}
             >
-              {editId ? "Update" : "Create"}
+              {editId ? "บันทึก" : "บันทึก"}
             </Button>
           </DialogActions>
         </Dialog>

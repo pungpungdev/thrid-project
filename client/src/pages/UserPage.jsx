@@ -195,14 +195,14 @@ function UserPage() {
         await updateUser(editId, form);
         setAlert({
           open: true,
-          message: "User updated successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       } else {
         await createUser(form);
         setAlert({
           open: true,
-          message: "User created successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       }
@@ -224,7 +224,7 @@ function UserPage() {
       fetchUsersTab2();
       setAlert({
         open: true,
-        message: "User deleted successfully!",
+        message: "ลบสำเร็จ",
         severity: "success",
       });
     } catch (error) {
@@ -243,7 +243,7 @@ function UserPage() {
       fetchUsersTab2();
       setAlert({
         open: true,
-        message: "User restored successfully!",
+        message: "กู้คืนสำเร็จ",
         severity: "success",
       });
     } catch (error) {
@@ -325,7 +325,7 @@ function UserPage() {
               ผู้ใช้งาน
             </Typography>
             <Button variant="contained" onClick={() => handleOpen()}>
-              Add User
+              เพิ่มผู้ใช้งาน
             </Button>
           </Box>
           <Tabs value={activeTab} onChange={handleChangeActiveTab}>
@@ -340,7 +340,7 @@ function UserPage() {
           </div>
 
           <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{editId ? "Edit User" : "Add User"}</DialogTitle>
+            <DialogTitle>{editId ? "แก้ไขผู้ใช้งาน" : "เพิ่มผู้ใช้งาน"}</DialogTitle>
             <DialogContent>
               <Box
                 sx={{
@@ -353,7 +353,7 @@ function UserPage() {
               >
                 <TextField
                   margin="dense"
-                  label="Username"
+                  label="ชื่อผู้ใช้งาน"
                   name="username"
                   value={form.username}
                   onChange={handleChange}
@@ -363,7 +363,7 @@ function UserPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="First Name"
+                  label="ชื่อ"
                   name="firstname"
                   value={form.firstname}
                   onChange={handleChange}
@@ -373,7 +373,7 @@ function UserPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Last Name"
+                  label="นามสกุล"
                   name="lastname"
                   value={form.lastname}
                   onChange={handleChange}
@@ -383,7 +383,7 @@ function UserPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Telephone"
+                  label="หมายเลขโทรศัพท์"
                   name="telephone"
                   value={form.telephone}
                   onChange={handleChange}
@@ -393,7 +393,7 @@ function UserPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Email"
+                  label="อีเมล์"
                   name="email"
                   value={form.email}
                   onChange={handleChange}
@@ -402,13 +402,13 @@ function UserPage() {
                   fullWidth
                 />
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="faculty-label">Faculty</InputLabel>
+                  <InputLabel id="faculty-label">คณะ</InputLabel>
                   <Select
                     labelId="faculty-label"
                     id="faculties_id"
                     name="faculties_id"
                     value={form.faculties_id}
-                    label="Faculty"
+                    label="คณะ"
                     onChange={handleChange}
                   >
                     <MenuItem value={null}>
@@ -422,13 +422,13 @@ function UserPage() {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="major-label">Major</InputLabel>
+                  <InputLabel id="major-label">สาขา</InputLabel>
                   <Select
                     labelId="major-label"
                     id="majors_id"
                     name="majors_id"
                     value={form.majors_id}
-                    label="Major"
+                    label="สาขา"
                     onChange={handleChange}
                   >
                     <MenuItem value={null}>
@@ -442,11 +442,11 @@ function UserPage() {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="role-label">Role</InputLabel>
+                  <InputLabel id="role-label">ตำแหน่ง</InputLabel>
                   <Select
                     labelId="role-label"
                     id="role"
-                    label="Role"
+                    label="ตำแหน่ง"
                     name="role"
                     value={form.role}
                     onChange={handleChange}
@@ -463,9 +463,9 @@ function UserPage() {
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>ยกเลิก</Button>
               <Button onClick={handleSubmit} variant="contained">
-                {editId ? "Update" : "Create"}
+                {editId ? "บันทึก" : "บันทึก"}
               </Button>
             </DialogActions>
           </Dialog>

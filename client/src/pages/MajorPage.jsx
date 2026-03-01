@@ -98,14 +98,14 @@ function MajorPage() {
         await updateMajor(editId, form);
         setAlert({
           open: true,
-          message: "Major updated successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       } else {
         await createMajor(form);
         setAlert({
           open: true,
-          message: "Major created successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       }
@@ -126,7 +126,7 @@ function MajorPage() {
       fetchMajors();
       setAlert({
         open: true,
-        message: "Major deleted successfully!",
+        message: "ลบสำเร็จ",
         severity: "success",
       });
     } catch (error) {
@@ -179,14 +179,14 @@ function MajorPage() {
               สาขาวิชา
             </Typography>
             <Button variant="contained" onClick={() => handleOpen()}>
-              Add Major
+              เพิ่มสาขาวิชา
             </Button>
           </Box>
 
           <DefaultTable columns={columns} rows={rows} />
 
           <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{editId ? "Edit Major" : "Add Major"}</DialogTitle>
+            <DialogTitle>{editId ? "แก้ไขข้อมูลสาขา" : "เพิ่มข้อมูลสาขาวิชา"}</DialogTitle>
             <DialogContent>
               <Box
                 sx={{
@@ -199,7 +199,7 @@ function MajorPage() {
               >
                 <TextField
                   margin="dense"
-                  label="Major Name"
+                  label="ชื่อสาขาวิชา"
                   name="name"
                   value={form.name}
                   onChange={handleChange}
@@ -208,11 +208,11 @@ function MajorPage() {
                   fullWidth
                 />
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="faculty-label">Faculty</InputLabel>
+                  <InputLabel id="faculty-label">รายชื่อคณะ</InputLabel>
                   <Select
                     labelId="faculty-label"
                     id="faculty_id"
-                    label="Faculty"
+                    label="รายชื่อคณะ"
                     name="faculty_id"
                     value={form.faculty_id}
                     onChange={handleChange}
@@ -229,9 +229,9 @@ function MajorPage() {
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>ยกเลิก</Button>
               <Button onClick={handleSubmit} variant="contained">
-                {editId ? "Update" : "Create"}
+                {editId ? "บันทึก" : "บันทึก"}
               </Button>
             </DialogActions>
           </Dialog>

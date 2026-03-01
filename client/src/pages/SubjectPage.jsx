@@ -151,14 +151,14 @@ function SubjectPage() {
         await updateSubject(editId, form);
         setAlert({
           open: true,
-          message: "Subject updated successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       } else {
         await createSubject(form);
         setAlert({
           open: true,
-          message: "Subject created successfully!",
+          message: "บันทึกสำเร็จ",
           severity: "success",
         });
       }
@@ -179,7 +179,7 @@ function SubjectPage() {
       fetchSubjects();
       setAlert({
         open: true,
-        message: "Subject deleted successfully!",
+        message: "ลบสำเร็จ",
         severity: "success",
       });
     } catch (error) {
@@ -231,14 +231,14 @@ function SubjectPage() {
               วิชา
             </Typography>
             <Button variant="contained" onClick={() => handleOpen()}>
-              Add Subject
+              เพิ่มรายวิชา
             </Button>
           </Box>
 
           <DefaultTable columns={columns} rows={rows} />
 
           <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{editId ? "Edit Subject" : "Add Subject"}</DialogTitle>
+            <DialogTitle>{editId ? "แก้ไขรายวิชา" : "เพิ่มรายวิชา"}</DialogTitle>
             <DialogContent>
               <Box
                 sx={{
@@ -251,7 +251,7 @@ function SubjectPage() {
               >
                 <TextField
                   margin="dense"
-                  label="Subject ID"
+                  label="รหัสวิชา"
                   name="subId"
                   value={form.subId}
                   onChange={handleChange}
@@ -261,7 +261,7 @@ function SubjectPage() {
                 />
                 <TextField
                   margin="dense"
-                  label="Subject Name"
+                  label="ชื่อวิชา"
                   name="subName"
                   value={form.subName}
                   onChange={handleChange}
@@ -272,7 +272,7 @@ function SubjectPage() {
                 <TextField
                   type="number"
                   margin="dense"
-                  label="Unit"
+                  label="หน่วยกิต"
                   name="subUnit"
                   value={form.subUnit}
                   onChange={handleChange}
@@ -281,11 +281,11 @@ function SubjectPage() {
                   fullWidth
                 />
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="faculty-label">Faculty</InputLabel>
+                  <InputLabel id="faculty-label">คณะ</InputLabel>
                   <Select
                     labelId="faculty-label"
                     id="facultiesId"
-                    label="Faculty"
+                    label="คณะ"
                     name="facultiesId"
                     value={form.facultiesId}
                     onChange={handleChange}
@@ -300,11 +300,11 @@ function SubjectPage() {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="major-label">Major</InputLabel>
+                  <InputLabel id="major-label">สาขา</InputLabel>
                   <Select
                     labelId="major-label"
                     id="majorId"
-                    label="Major"
+                    label="สาขา"
                     name="majorId"
                     value={form.majorId}
                     onChange={handleChange}
@@ -319,11 +319,11 @@ function SubjectPage() {
                   </Select>
                 </FormControl>
                 <FormControl fullWidth margin="dense">
-                  <InputLabel id="sub-group-label">Sub Group</InputLabel>
+                  <InputLabel id="sub-group-label">กลุ่มวิชา</InputLabel>
                   <Select
                     labelId="sub-group-label"
                     id="subGroupId"
-                    label="Sub Group"
+                    label="กลุ่มวิชา"
                     name="subGroupId"
                     value={form.subGroupId}
                     onChange={handleChange}
@@ -340,9 +340,9 @@ function SubjectPage() {
               </Box>
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>ยกเลิก</Button>
               <Button onClick={handleSubmit} variant="contained">
-                {editId ? "Update" : "Create"}
+                {editId ? "บันทึก" : "บันทึก"}
               </Button>
             </DialogActions>
           </Dialog>
