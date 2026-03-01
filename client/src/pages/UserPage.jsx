@@ -144,7 +144,7 @@ function UserPage() {
       }
       setForm({
         username: user.username || "",
-        password: user.password || "",
+        //password: /*user.password*/ "P@ssw0rd" || "",
         firstname: user.firstname || "",
         lastname: user.lastname || "",
         telephone: user.telephone || "",

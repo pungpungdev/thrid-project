@@ -32,9 +32,9 @@ const columns = [
   {
     field: "profile_img",
     headerName: "รูปภาพ",
-    renderCell: (row) => (
+    renderCell: (params) => (
       <img
-        src={row.profile_img ? row.profile_img : defaultProfileImg}
+        src={params.row.profile_img ? params.row.profile_img : defaultProfileImg}
         alt="profile"
         style={{
           width: 40,
@@ -126,7 +126,7 @@ function StudentPage() {
       fetchMajorsByFacultyId(student.faculties_id);
       setForm({
         student_id: student.student_id || "",
-        password: student.password || "",
+        //password: /*student.password*/ "P@ssw0rd" || "",
         title_th: student.title_th || "",
         firstname_th: student.firstname_th || "",
         lastname_th: student.lastname_th || "",

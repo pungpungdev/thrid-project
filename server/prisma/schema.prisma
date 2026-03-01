@@ -41,7 +41,7 @@ model Student {
   faculties_id Int
   majors_id    Int
   certificate  String? @default("")
-  profile_img  String? @default("")
+  profile_img  String? @db.LongText
   email        String
   actives      Boolean
 

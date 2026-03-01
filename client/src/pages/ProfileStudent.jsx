@@ -82,7 +82,7 @@ function ProfileStudent() {
   const handleSave = async () => {
     resetErrors();
     console.log(validate(form));
-    console.log(errors)
+    console.log(errors);
     if (!validate(form)) return;
     setLoading(true);
     try {
@@ -125,9 +125,24 @@ function ProfileStudent() {
                 mb: 2,
               }}
             >
-              <Avatar sx={{ width: 80, height: 80, mb: 2 }}>
-                {student.firstname_th?.charAt(0)}
-              </Avatar>
+              {student.profile_img ? (
+                <img
+                  src={student.profile_img}
+                  alt="profile"
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    border: "1px solid #eee",
+                    mp: 2,
+                  }}
+                />
+              ) : (
+                <Avatar sx={{ width: 80, height: 80, mb: 2 }}>
+                  {student.firstname_th?.charAt(0)}
+                </Avatar>
+              )}
               <Typography variant="h5" sx={{ mb: 1 }}>
                 {student.title_th ? "นาย" : "นางสาว"} {student.firstname_th}{" "}
                 {student.lastname_th}
