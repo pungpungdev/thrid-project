@@ -250,7 +250,7 @@ function StudentPage() {
       faculties_id: faculties.find((f) => f.name === item["Faculty"])?.id || null,
       majors_id: allMajors.find((m) => m.name === item["Major"])?.id || null,
       telephone: String(item["Telephone"]) || "",
-      password: "password123",
+      password: "P@ssw0rd",
       actives: true,
     }));
     console.log("Imported JSON:", importData);
