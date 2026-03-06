@@ -97,7 +97,7 @@ export default function FacultyPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.message || "Error occurred",
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -115,7 +115,7 @@ export default function FacultyPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.message || "Error occurred",
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }

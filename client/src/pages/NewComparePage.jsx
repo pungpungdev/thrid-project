@@ -329,7 +329,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
       setAlert({
         open: true,
         message:
-          error.response?.data?.error || error.message || "Error occurred",
+          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -356,7 +356,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
       setAlert({
         open: true,
         message:
-          error.response?.data?.error || error.message || "Error occurred",
+          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -376,7 +376,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
       setAlert({
         open: true,
         message:
-          error.response?.data?.error || error.message || "Error occurred",
+          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -396,7 +396,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
       setAlert({
         open: true,
         message:
-          error.response?.data?.error || error.message || "Error occurred",
+          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }

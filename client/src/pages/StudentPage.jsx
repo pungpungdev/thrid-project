@@ -63,7 +63,7 @@ function StudentPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     student_id: "",
-    password: "P@ssw0rd",
+    password: "123456",
     title_th: "",
     firstname_th: "",
     lastname_th: "",
@@ -126,7 +126,7 @@ function StudentPage() {
       fetchMajorsByFacultyId(student.faculties_id);
       setForm({
         student_id: student.student_id || "",
-        //password: /*student.password*/ "P@ssw0rd" || "",
+        //password: /*student.password*/ "123456" || "",
         title_th: student.title_th || "",
         firstname_th: student.firstname_th || "",
         lastname_th: student.lastname_th || "",
@@ -142,7 +142,7 @@ function StudentPage() {
     } else {
       setForm({
         student_id: "",
-        password: "P@ssw0rd",
+        password: "123456",
         title_th: "",
         firstname_th: "",
         lastname_th: "",
@@ -250,7 +250,7 @@ function StudentPage() {
       faculties_id: faculties.find((f) => f.name === item["Faculty"])?.id || null,
       majors_id: allMajors.find((m) => m.name === item["Major"])?.id || null,
       telephone: String(item["Telephone"]) || "",
-      password: "P@ssw0rd",
+      password: "123456",
       actives: true,
     }));
     console.log("Imported JSON:", importData);
@@ -321,7 +321,7 @@ function StudentPage() {
               sx={{ mr: 2 }}
               onClick={handleExport}
             >
-              Export Excel
+              ส่งออกข้อมูล
             </Button>
             {/* Import Button */}
             <input
@@ -338,7 +338,7 @@ function StudentPage() {
                 component="span"
                 startIcon={<UploadFileIcon />}
               >
-                Import File
+                นำเข้าข้อมูล
               </Button>
             </label>
           </Box>
@@ -498,7 +498,7 @@ function StudentPage() {
                 </Button>
                 {form.profile_img && (
                   <Box sx={{ mt: 1 }}>
-                    <Typography variant="body2">
+                    <Typography variant="body2" sx={{display:'none'}}>
                       Selected: รูปภาพถูกแปลงเป็น base64 แล้ว
                     </Typography>
                     <img

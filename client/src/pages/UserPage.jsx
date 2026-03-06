@@ -47,7 +47,7 @@ const columns = [
     headerName: "ระดับผู้ใช้งาน",
     renderCell: (params) => {
       let color = "default";
-      let label = params.value;
+      let label = params.value === "Teacher" ? "อาจารย์" : params.value === "Committee" ? "กรรมการ" : params.value === "Admin" ? "แอดมิน" : "";
       if (params.value === "Teacher") color = "warning";
       else if (params.value === "Admin") color = "primary";
       else if (params.value === "Committee") color = "orange";
@@ -74,7 +74,7 @@ function UserPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     username: "",
-    password: "P@ssw0rd",
+    password: "123456",
     firstname: "",
     lastname: "",
     telephone: "",
@@ -144,7 +144,7 @@ function UserPage() {
       }
       setForm({
         username: user.username || "",
-        //password: /*user.password*/ "P@ssw0rd" || "",
+        //password: /*user.password*/ "123456" || "",
         firstname: user.firstname || "",
         lastname: user.lastname || "",
         telephone: user.telephone || "",
@@ -158,7 +158,7 @@ function UserPage() {
       setMajors([]);
       setForm({
         username: "",
-        password: "P@ssw0rd",
+        password: "123456",
         firstname: "",
         lastname: "",
         telephone: "",
@@ -211,7 +211,7 @@ function UserPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.response?.data?.error || error.message || "Error occurred",
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -230,7 +230,7 @@ function UserPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.response?.data?.error || error.message || "Error occurred",
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -249,7 +249,7 @@ function UserPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.response?.data?.error || error.message || "Error occurred",
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }

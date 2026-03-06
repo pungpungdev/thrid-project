@@ -1,5 +1,5 @@
 export const USER_ROLES = [
-  { value: "Admin", label: "Admin" },
-  { value: "Teacher", label: "Teacher" },
-  { value: "Committee", label: "Committee" },
+  { value: "Admin", label: "แอดมิน" },
+  { value: "Teacher", label: "อาจารย์" },
+  { value: "Committee", label: "กรรมการ" },
 ];

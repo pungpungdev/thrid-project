@@ -167,7 +167,7 @@ function ProfileStudent() {
             >
               <TextField
                 margin="dense"
-                label="Telephone"
+                label="โทรศัพท์"
                 name="telephone"
                 value={form.telephone}
                 onChange={handleChange}
@@ -178,7 +178,7 @@ function ProfileStudent() {
               />
               <TextField
                 margin="dense"
-                label="Email"
+                label="อีเมล์"
                 name="email"
                 value={form.email}
                 onChange={handleChange}
@@ -222,11 +222,11 @@ function ProfileStudent() {
                 fullWidth
               /> */}
               <FormControl fullWidth margin="dense">
-                <InputLabel id="faculty-label">Faculty</InputLabel>
+                <InputLabel id="faculty-label">คณะ</InputLabel>
                 <Select
                   labelId="faculty-label"
                   id="faculties_id"
-                  label="Faculty"
+                  label="คณะ"
                   name="faculties_id"
                   value={form.faculties_id}
                   onChange={handleChange}
@@ -242,11 +242,11 @@ function ProfileStudent() {
                 </Select>
               </FormControl>
               <FormControl fullWidth margin="dense">
-                <InputLabel id="major-label">Major</InputLabel>
+                <InputLabel id="major-label">สาขา</InputLabel>
                 <Select
                   labelId="major-label"
                   id="majors_id"
-                  label="Major"
+                  label="สาขา"
                   name="majors_id"
                   value={form.majors_id}
                   onChange={handleChange}

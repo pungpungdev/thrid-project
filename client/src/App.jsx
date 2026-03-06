@@ -15,6 +15,8 @@ import AnnualDataPage from "./pages/AnnualDataPage";
 import PreviewPage from "./pages/PreviewPage";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import "dayjs/locale/th";
+
 import TestPage from "./pages/TestPage";
 import NewComparePage from "./pages/newComparePage";
 import NewSummaryPage from "./pages/NewSummaryPage";
@@ -23,7 +25,12 @@ import PreviewDocumentPage from "./pages/PreviewDocument";
 function App() {
   const { role } = useAuth();
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale="th"
+      // นำค่า thTH มาใส่เพื่อให้ปุ่มต่างๆ เป็นภาษาไทย
+      
+    >
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
@@ -92,9 +99,7 @@ function App() {
           <Route
             path="/newCompare"
             element={
-              <ProtectedRoute
-                allowedRoles={["Admin", "Teacher", "Committee"]}
-              >
+              <ProtectedRoute allowedRoles={["Admin", "Teacher", "Committee"]}>
                 <NewComparePage />
               </ProtectedRoute>
             }
@@ -102,9 +107,7 @@ function App() {
           <Route
             path="/newSummary"
             element={
-              <ProtectedRoute
-                allowedRoles={["Admin", "Teacher", "Committee"]}
-              >
+              <ProtectedRoute allowedRoles={["Admin", "Teacher", "Committee"]}>
                 <NewSummaryPage />
               </ProtectedRoute>
             }
@@ -112,7 +115,10 @@ function App() {
           <Route path="/preview" element={<PreviewPage />} />
           <Route path="/profileStudent" element={<ProfileStudent />} />
           <Route path="/test" element={<TestPage />} />
-          <Route path="/previewDocument/:id" element={<PreviewDocumentPage />} />
+          <Route
+            path="/previewDocument/:id"
+            element={<PreviewDocumentPage />}
+          />
         </Routes>
       </BrowserRouter>
     </LocalizationProvider>

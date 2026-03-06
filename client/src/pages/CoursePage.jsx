@@ -146,8 +146,8 @@ function CoursePage() {
         name: "",
         year: "",
         term: "",
-        startDate: null,
-        endDate: null,
+        startDate: dayjs(),
+        endDate: dayjs(),
         facultyId: "",
         majorId: "",
         subjectIds: [],
@@ -180,15 +180,15 @@ function CoursePage() {
         res = await annualCourseService.updateAnnualCourse(editId, courseData);
         res2 =
           await annualCourseService.deleteAnnualCourseSubjectByAnnualCourseId(
-            editId
+            editId,
           );
         await Promise.all(
           subjectIds.map((subjectId) =>
             annualCourseService.createAnnualCourseSubject({
               annualCourseId: res.data.id,
               subjectId,
-            })
-          )
+            }),
+          ),
         );
       } else {
         res = await annualCourseService.createAnnualCourse(courseData);
@@ -197,16 +197,16 @@ function CoursePage() {
             annualCourseService.createAnnualCourseSubject({
               annualCourseId: res.data.id,
               subjectId,
-            })
-          )
+            }),
+          ),
         );
       }
       setOpen(false);
       setEditId(null);
       fetchCourses();
-      showAlert("success", "Saved successfully!");
+      showAlert("success", "บันทึกสำเร็จ");
     } catch (error) {
-      showAlert("error", error.message || "Something went wrong!");
+      showAlert("error", "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message);
     }
   };
 
@@ -214,9 +214,9 @@ function CoursePage() {
     try {
       await annualCourseService.deleteAnnualCourse(id);
       fetchCourses();
-      showAlert("success", "Deactived successfully!");
+      showAlert("success", "ปิดใช้งาน");
     } catch (error) {
-      showAlert("error", error.message || "Something went wrong!");
+      showAlert("error", "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message);
     }
   };
 
@@ -224,9 +224,9 @@ function CoursePage() {
     try {
       await annualCourseService.activeAnnualCourse(id);
       fetchCourses();
-      showAlert("success", "Actived successfully!");
+      showAlert("success", "เปิดใช้งาน");
     } catch (error) {
-      showAlert("error", error.message || "Something went wrong!");
+      showAlert("error", "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message);
     }
   };
 
@@ -278,7 +278,7 @@ function CoursePage() {
           ?.map(
             (s) =>
               subjects.find((sub) => sub.id === s.subjectId)?.subName ||
-              s.subjectId
+              s.subjectId,
           )
           .join(", ");
         return (
@@ -292,8 +292,8 @@ function CoursePage() {
                 row.subjects.map(
                   (s) =>
                     subjects.find((sub) => sub.id === s.subjectId)?.subName ||
-                    s.subjectId
-                )
+                    s.subjectId,
+                ),
               );
               setSubjectDialogOpen(true);
             }}
@@ -419,13 +419,13 @@ function CoursePage() {
               onChange={(newValue) =>
                 handleChange({ target: { name: "startDate", value: newValue } })
               }
-              format="DD/MM/YYYY"
               slotProps={{
                 textField: {
                   error: !!errors.startDate,
                   helperText: errors.startDate,
                 },
               }}
+              format="DD/MM/YYYY"
             />
             <DatePicker
               name="endDate"

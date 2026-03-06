@@ -114,7 +114,7 @@ function MajorPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.message || "Error occurred",
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -132,7 +132,7 @@ function MajorPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message: error.message || "Error occurred",
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
