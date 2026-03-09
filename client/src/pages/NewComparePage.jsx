@@ -739,11 +739,11 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
                   </Typography>
 
                   <FormControl fullWidth margin="dense">
-                    <InputLabel id="student-label">Student</InputLabel>
+                    <InputLabel id="student-label">รายชื่อนักศึกษา</InputLabel>
                     <Select
                       labelId="student-label"
                       id="studentId"
-                      label="Student"
+                      label="รายชื่อนักศึกษา"
                       name="studentId"
                       value={form.studentId}
                       onChange={handleChange}
