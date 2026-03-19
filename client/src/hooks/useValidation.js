@@ -10,9 +10,9 @@ export function useValidation(requiredFields = []) {
         newErrors[field] = "กรุณาเพิ่มข้อมูลในช่องว่าง";
       }
     });
-    if (form.student_id && !/^\d{12}$/.test(form.student_id)) {
+    /* if (form.student_id && !/^\d{12}$/.test(form.student_id)) {
       newErrors.student_id = "รหัสนักศึกษาจะต้องมี12ตัว (เฉพาะตัวเลข)";
-    }
+    } */
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

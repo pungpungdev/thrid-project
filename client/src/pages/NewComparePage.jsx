@@ -148,19 +148,46 @@ function NewComparePage() {
   const fetchStudents = async () => {
     const res = await getStudents();
     console.log("Fetched students:", res.data);
-    setStudents(res.data);
+    const { user } = useAuth();
+    console.log("userObj", user);
+    if (user.role === "Student") {
+      const myData = res.data.filter((data) => data.student_id === user.username);
+      setStudents(myData);
+    } else {
+      setStudents(res.data);
+    }
   };
 
   const fetchStudentTransfers = async () => {
     const res = await getStudentTransfers();
     console.log("Fetched student transfers:", res.data);
-    setStudentTransfers(res.data);
+    const { user } = useAuth();
+    console.log("userObj", user);
+    if (user.role === "Student") {
+      const myStudentId = students.find(
+        (student) => student.student_id === user.username,
+      )?.id;
+      const myData = res.data.filter((data) => data.studentId === myStudentId);
+      setStudentTransfers(myData);
+    } else {
+      setStudentTransfers(res.data);
+    }
   };
 
   const fetchInactiveStudentTransfers = async () => {
     const res = await getInactiveStudentTransfers();
     console.log("Fetched inactive student transfers:", res.data);
-    setStudentTransfersTab2(res.data);
+    const { user } = useAuth();
+    console.log("userObj", user);
+    if (user.role === "Student") {
+      const myStudentId = students.find(
+        (student) => student.student_id === user.username,
+      )?.id;
+      const myData = res.data.filter((data) => data.studentId === myStudentId);
+      setStudentTransfersTab2(myData);
+    } else {
+      setStudentTransfersTab2(res.data);
+    }
   };
 
   const fetchAnnualCourses = async () => {
@@ -170,16 +197,20 @@ function NewComparePage() {
     const uniqueYears = [...new Set(result.data.map((c) => c.year))];
     setYears(uniqueYears);
   };
+
+  // ใน useEffect หลักโหลดแค่ students
   useEffect(() => {
-    const { user } = useAuth();
-    console.log("userObj", user);
-  }, []);
-  useEffect(() => {
-    fetchAnnualCourses();
     fetchStudents();
-    fetchStudentTransfers();
-    fetchInactiveStudentTransfers();
+    fetchAnnualCourses();
   }, []);
+
+  // เมื่อ students โหลดเสร็จ (ไม่เป็นค่าว่าง) ค่อยโหลดข้อมูลที่เกี่ยวข้อง
+  useEffect(() => {
+    if (students.length > 0) {
+      fetchStudentTransfers();
+      fetchInactiveStudentTransfers();
+    }
+  }, [students]); // ทำงานเมื่อ students เปลี่ยนค่า
 
   const requiredFields = ["studentId", "annualCourseId", "status"];
   const { validate, validateTransferData, resetErrors, errors } =
@@ -282,21 +313,21 @@ function NewComparePage() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
-  const newData = [...transferData];
-  
-  if (key === 'selected') {
-    // สำหรับ Radio: วนลูปให้กลุ่มอื่นในวิชาเดียวกันเป็น false ให้หมดก่อน
-    newData[subjectIdx].groups.forEach((g, i) => {
-      newData[subjectIdx].groups[i].selected = (i === groupIdx);
-    });
-  } else {
-    // สำหรับ Checkbox: เปลี่ยนค่าเฉพาะกลุ่มนั้นๆ
-    newData[subjectIdx].groups[groupIdx][key] = value;
-  }
+  const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
+    const newData = [...transferData];
 
-  setTransferData(newData);
-};
+    if (key === "selected") {
+      // สำหรับ Radio: วนลูปให้กลุ่มอื่นในวิชาเดียวกันเป็น false ให้หมดก่อน
+      newData[subjectIdx].groups.forEach((g, i) => {
+        newData[subjectIdx].groups[i].selected = i === groupIdx;
+      });
+    } else {
+      // สำหรับ Checkbox: เปลี่ยนค่าเฉพาะกลุ่มนั้นๆ
+      newData[subjectIdx].groups[groupIdx][key] = value;
+    }
+
+    setTransferData(newData);
+  };
 
   const handleSubmit = async () => {
     resetErrors();
@@ -328,8 +359,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
     } catch (error) {
       setAlert({
         open: true,
-        message:
-          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -355,8 +385,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
     } catch (error) {
       setAlert({
         open: true,
-        message:
-          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -375,8 +404,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
     } catch (error) {
       setAlert({
         open: true,
-        message:
-          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -395,8 +423,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
     } catch (error) {
       setAlert({
         open: true,
-        message:
-          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -748,6 +775,7 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
                       value={form.studentId}
                       onChange={handleChange}
                       error={!!errors.studentId}
+                      disabled={!!editId}
                     >
                       {students.map((student) => (
                         <MenuItem key={student.id} value={student.id}>
@@ -1301,7 +1329,14 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
                                               type="radio"
                                               name={`selected-${mainCourse.id}`}
                                               checked={group.selected || false}
-                                              onChange={() => handleRadioChange(mIdx, gIdx, 'selected', true)}
+                                              onChange={() =>
+                                                handleRadioChange(
+                                                  mIdx,
+                                                  gIdx,
+                                                  "selected",
+                                                  true,
+                                                )
+                                              }
                                             />
                                             <span className="checkmark"></span>
                                           </label>
@@ -1314,7 +1349,14 @@ const handleRadioChange = (subjectIdx, groupIdx, key, value) => {
                                               type="checkbox"
                                               name={`isNotCE-${mainCourse.id}-${group.groupId}`}
                                               checked={group.isNotCE || false}
-                                              onChange={(e) => handleRadioChange(mIdx, gIdx, 'isNotCE', e.target.checked)}
+                                              onChange={(e) =>
+                                                handleRadioChange(
+                                                  mIdx,
+                                                  gIdx,
+                                                  "isNotCE",
+                                                  e.target.checked,
+                                                )
+                                              }
                                             />
                                             <span className="checkmark"></span>
                                           </label>

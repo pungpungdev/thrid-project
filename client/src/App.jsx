@@ -99,7 +99,7 @@ function App() {
           <Route
             path="/newCompare"
             element={
-              <ProtectedRoute allowedRoles={["Admin", "Teacher", "Committee"]}>
+              <ProtectedRoute allowedRoles={["Admin", "Teacher", "Committee", "Student"]}>
                 <NewComparePage />
               </ProtectedRoute>
             }
@@ -107,7 +107,7 @@ function App() {
           <Route
             path="/newSummary"
             element={
-              <ProtectedRoute allowedRoles={["Admin", "Teacher", "Committee"]}>
+              <ProtectedRoute allowedRoles={["Admin", "Teacher", "Committee", "Student"]}>
                 <NewSummaryPage />
               </ProtectedRoute>
             }

@@ -79,6 +79,7 @@ function NewSummaryPage() {
   const [studentTransfers, setStudentTransfers] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [transferData, setTransferData] = useState([]);
+  const [role,setRole] = useState("");
 
   const [openSummary, setOpenSummary] = useState(false);
   const [form, setForm] = useState({
@@ -106,7 +107,18 @@ function NewSummaryPage() {
     const filteredTransfers = res.data.filter(
       (t) => t.status === "APPROVED" || t.status === "WAITING_FOR_APPROVAL",
     );
-    setStudentTransfers(filteredTransfers);
+    const { user } = useAuth();
+    console.log("userObj", user);
+    setRole(user.role)
+    if (user.role === "Student") {
+      const myStudentId = students.find(
+        (student) => student.student_id === user.username,
+      )?.id;
+      const myData = filteredTransfers.filter((data) => data.studentId === myStudentId);
+      setStudentTransfers(myData);
+    } else {
+      setStudentTransfers(filteredTransfers);
+    }
   };
 
   const fetchAnnualCourses = async () => {
@@ -115,14 +127,14 @@ function NewSummaryPage() {
     setAnnualCourses(result.data);
   };
   useEffect(() => {
-    const { user } = useAuth();
-    console.log("userObj", user);
-  }, []);
-  useEffect(() => {
     fetchAnnualCourses();
     fetchStudents();
-    fetchStudentTransfers();
   }, []);
+  useEffect(() => {
+    if (students.length > 0) {
+      fetchStudentTransfers();
+    }
+  }, [students]);
 
   const requiredFields = ["studentId", "annualCourseId", "status"];
   const { validate, validateTransferData, resetErrors, errors } =
@@ -169,8 +181,7 @@ function NewSummaryPage() {
     } catch (error) {
       setAlert({
         open: true,
-        message:
-          "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
+        message: "ดำเนินการไม่สำเร็จกรุณาลองใหม่อีกครั้ง" || error.message,
         severity: "error",
       });
     }
@@ -474,9 +485,9 @@ function NewSummaryPage() {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseSummary}>ยกเลิก</Button>
-              <Button onClick={handleSubmitSummary} variant="contained">
+              {role !== 'Student' && <Button onClick={handleSubmitSummary} variant="contained">
                 {"อนุมัติผลการเทียบโอน"}
-              </Button>
+              </Button>}
             </DialogActions>
           </Dialog>
         </Box>

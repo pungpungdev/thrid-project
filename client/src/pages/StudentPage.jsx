@@ -34,7 +34,9 @@ const columns = [
     headerName: "รูปภาพ",
     renderCell: (params) => (
       <img
-        src={params.row.profile_img ? params.row.profile_img : defaultProfileImg}
+        src={
+          params.row.profile_img ? params.row.profile_img : defaultProfileImg
+        }
         alt="profile"
         style={{
           width: 40,
@@ -161,11 +163,30 @@ function StudentPage() {
 
   const handleClose = () => setOpen(false);
 
+  const formatStudentId = (value) => {
+    // 1. ลบทุกอย่างที่ไม่ใช่ตัวเลขออกก่อน
+    const nums = value.replace(/\D/g, "");
+
+    // 2. ถ้าความยาวเกิน 12 ตัว ให้ตัดทิ้ง
+    const trimmed = nums.substring(0, 12);
+
+    // 3. ถ้าพิมพ์มาถึงตัวสุดท้าย (ตัวที่ 12) ให้ใส่ขีดก่อนตัวนั้น
+    if (trimmed.length === 12) {
+      return `${trimmed.slice(0, 11)}-${trimmed.slice(11)}`;
+    }
+
+    // ถ้ายังพิมพ์ไม่ถึง 12 ตัว ให้แสดงแค่ตัวเลขปกติ
+    return trimmed;
+  };
+
   const handleChange = (e) => {
     console.log(e.target.name, e.target.value);
     if (e.target.name === "faculties_id") {
       fetchMajorsByFacultyId(e.target.value);
       setForm({ ...form, [e.target.name]: e.target.value, majors_id: "" });
+    } else if (e.target.name === "student_id") {
+      const formattedValue = formatStudentId(e.target.value);
+      setForm({ ...form, [e.target.name]: formattedValue });
     } else {
       setForm({ ...form, [e.target.name]: e.target.value });
     }
@@ -216,13 +237,13 @@ function StudentPage() {
     // Prepare data for export
     const exportData = students.map((student) => ({
       "Student Id": student.student_id,
-      "Title": student.title_th,
+      Title: student.title_th,
       "First Name": student.firstname_th,
       "Last Name": student.lastname_th,
-      "Email": student.email,
-      "Faculty": student.faculty?.name || "",
-      "Major": student.major?.name || "",
-      "Telephone": student.telephone,
+      Email: student.email,
+      Faculty: student.faculty?.name || "",
+      Major: student.major?.name || "",
+      Telephone: student.telephone,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
@@ -247,7 +268,8 @@ function StudentPage() {
       firstname_th: String(item["First Name"]) || "",
       lastname_th: String(item["Last Name"]) || "",
       email: String(item["Email"]) || "",
-      faculties_id: faculties.find((f) => f.name === item["Faculty"])?.id || null,
+      faculties_id:
+        faculties.find((f) => f.name === item["Faculty"])?.id || null,
       majors_id: allMajors.find((m) => m.name === item["Major"])?.id || null,
       telephone: String(item["Telephone"]) || "",
       password: "123456",
@@ -347,7 +369,9 @@ function StudentPage() {
         <DefaultTable columns={columns} rows={rows} />
 
         <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{editId ? "แก้ไขรายชื่อนักศึกษา" : "เพิ่มรายชื่อนักศึกษา"}</DialogTitle>
+          <DialogTitle>
+            {editId ? "แก้ไขรายชื่อนักศึกษา" : "เพิ่มรายชื่อนักศึกษา"}
+          </DialogTitle>
           <DialogContent>
             <Box
               component="form"
@@ -378,7 +402,8 @@ function StudentPage() {
                   onChange={handleChange}
                   fullWidth
                   error={!!errors.student_id}
-                  helperText={errors.student_id}
+                  placeholder="67605100006-5"
+                  helperText={errors.student_id || "ตัวอย่าง: 67605100006-5"}
                 />
                 <TextField
                   margin="dense"
@@ -473,7 +498,7 @@ function StudentPage() {
                     {majors
                       .filter(
                         (major) =>
-                          major.faculty_id === Number(form.faculties_id)
+                          major.faculty_id === Number(form.faculties_id),
                       )
                       .map((major) => (
                         <MenuItem key={major.id} value={major.id}>
@@ -498,7 +523,7 @@ function StudentPage() {
                 </Button>
                 {form.profile_img && (
                   <Box sx={{ mt: 1 }}>
-                    <Typography variant="body2" sx={{display:'none'}}>
+                    <Typography variant="body2" sx={{ display: "none" }}>
                       Selected: รูปภาพถูกแปลงเป็น base64 แล้ว
                     </Typography>
                     <img

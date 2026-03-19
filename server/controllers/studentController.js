@@ -73,31 +73,28 @@ exports.softDeleteStudent = async (req, res) => {
 exports.bulkStudents = async (req, res) => {
   const students = req.body;
   try {
-    /* const createdStudents = await prisma.student.createMany({
-      data: students.map((student) => ({
-        ...student,
-        password: bcrypt.hashSync(student.password, 10),
-      })),
-    }); */
+    const operations = students.map((student) => {
+      // 1. Hash รหัสผ่านเตรียมไว้สำหรับกรณี Create
+      const hashedPassword = bcrypt.hashSync(student.password, 10);
 
-    const excelData = students.map((student) => ({
-      ...student,
-      password: bcrypt.hashSync(student.password, 10),
-    }));
-    // 2. ใช้ Transaction เพื่อความเร็วและความถูกต้อง (All or Nothing)
-    // การใช้ map เพื่อสร้าง Array ของ Promise และใช้ $transaction จัดการ
-    const operations = excelData.map((student) =>
-      prisma.student.upsert({
+      // 2. แยก password ออกจาก student object เพื่อใช้ในการ update
+      // โดยใช้ ...rest เพื่อเก็บข้อมูลที่เหลือทั้งหมดที่ไม่ใช่ password
+      const { password, ...studentWithoutPassword } = student;
+
+      return prisma.student.upsert({
         where: { student_id: student.student_id },
-        update: { ...student }, // ถ้าซ้ำให้เขียนทับด้วยข้อมูลใหม่จาก Excel
-        create: { ...student }, // ถ้าไม่ซ้ำให้สร้างใหม่
-      }),
-    );
+        update: { 
+          ...studentWithoutPassword // ส่งเฉพาะข้อมูลที่เหลือ (ไม่มี password)
+        },
+        create: { 
+          ...student, 
+          password: hashedPassword // ถ้าสร้างใหม่ ให้ใช้รหัสผ่านที่ hash แล้ว
+        },
+      });
+    });
 
     const results = await prisma.$transaction(operations);
-    res
-      .status(201)
-      .json({ message: "Students imported", count: results.length });
+    res.status(201).json({ message: "Students imported", count: results.length });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
