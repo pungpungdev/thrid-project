@@ -7,3 +7,4 @@ export const updateStudent = (id, data) => api.put(`/api/students/${id}`, data);
 export const deleteStudent = (id) => api.delete(`/api/students/${id}`);
 export const importStudents = (data) =>
   api.post('/api/students/import', data);
+export const updateStudentPassword = (data) => api.patch('/api/students/updatePassword', data);

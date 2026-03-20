@@ -83,18 +83,60 @@ exports.bulkStudents = async (req, res) => {
 
       return prisma.student.upsert({
         where: { student_id: student.student_id },
-        update: { 
-          ...studentWithoutPassword // ส่งเฉพาะข้อมูลที่เหลือ (ไม่มี password)
+        update: {
+          ...studentWithoutPassword, // ส่งเฉพาะข้อมูลที่เหลือ (ไม่มี password)
         },
-        create: { 
-          ...student, 
-          password: hashedPassword // ถ้าสร้างใหม่ ให้ใช้รหัสผ่านที่ hash แล้ว
+        create: {
+          ...student,
+          password: hashedPassword, // ถ้าสร้างใหม่ ให้ใช้รหัสผ่านที่ hash แล้ว
         },
       });
     });
 
     const results = await prisma.$transaction(operations);
-    res.status(201).json({ message: "Students imported", count: results.length });
+    res
+      .status(201)
+      .json({ message: "Students imported", count: results.length });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.updateStudentPassword = async (req, res) => {
+  try {
+    const data = { ...req.body };
+    // If password is being updated, hash it
+
+    let findStudent = await prisma.student.findUnique({
+      where: { student_id: data.username },
+    });
+
+    if (findStudent) {
+      const valid = await bcrypt.compare(
+        data.oldPassword,
+        findStudent.password,
+      );
+      if (!valid) {
+        return res
+          .status(401)
+          .json({ error: "โปรดกรอกรหัสผ่านเก่าให้ถูกต้อง" });
+      } else {
+        if (data.newPassword !== data.newPassword2) {
+          return res
+            .status(400)
+            .json({ error: "โปรดกรอกรหัสผ่านใหม่ให้ตรงกัน" });
+        } else {
+          data.newPassword = await bcrypt.hash(data.newPassword, 10);
+          const student = await prisma.student.update({
+            where: { student_id: data.username },
+            data: { password: data.newPassword },
+          });
+          res.json(student);
+        }
+      }
+    } else {
+      return res.status(400).json({ error: "ไม่เจอผู้ใช้งานนี้" });
+    }
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

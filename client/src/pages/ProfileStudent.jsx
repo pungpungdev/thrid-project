@@ -14,8 +14,21 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
-import { getStudent, updateStudent } from "../services/studentService";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+
+import CustomAlert from "../components/CustomAlert";
+import {
+  getStudent,
+  updateStudent,
+  updateStudentPassword,
+} from "../services/studentService";
 import { useValidation } from "../hooks/useValidation";
 import { getFaculties } from "../services/facultyService";
 import { getMajorsByFacultyId } from "../services/majorService";
@@ -27,17 +40,33 @@ function ProfileStudent() {
   const [majors, setMajors] = useState([]);
   const [editMode, setEditMode] = useState(false);
   const [form, setForm] = useState({});
+  const [form2, setForm2] = useState({});
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [open, setOpen] = useState(false);
+  const [alert, setAlert] = useState({
+    open: false,
+    severity: "success",
+    message: "",
+  });
 
   const requiredFields = ["telephone", "email", "faculties_id", "majors_id"];
   const { errors, validate, resetErrors } = useValidation(requiredFields);
+  const requiredFields2 = ["oldPassword", "newPassword", "newPassword2"];
+  const {
+    errors: errors2,
+    validate: validate2,
+    resetErrors: resetErrors2,
+  } = useValidation(requiredFields2);
 
   const fetchStudent = async () => {
     const res = await getStudent(user.id);
     console.log("Fetched student:", res.data);
     setStudent(res.data);
     setForm(res.data);
+    setForm2({
+      username: user.username,
+    });
     fetchFaculties();
     fetchMajorsByFacultyId(res.data.faculties_id);
   };
@@ -60,6 +89,22 @@ function ProfileStudent() {
       setForm({ ...form, [e.target.name]: e.target.value });
     }
   };
+  const handleChangePassword = (e) => {
+    console.log(e.target.name, e.target.value);
+    {
+      setForm2({ ...form2, [e.target.name]: e.target.value });
+    }
+  };
+
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showNewPassword2, setShowNewPassword2] = useState(false);
+
+  // ฟังก์ชันสลับค่า
+  const handleClickShowOldPassword = () => setShowOldPassword(!showOldPassword);
+  const handleClickShowNewPassword = () => setShowNewPassword(!showNewPassword);
+  const handleClickShowNewPassword2 = () =>
+    setShowNewPassword2(!showNewPassword2);
 
   useEffect(() => {
     if (role === "Student" && user?.id) {
@@ -92,6 +137,30 @@ function ProfileStudent() {
       setSuccessMsg("บันทึกข้อมูลสำเร็จ!");
     } catch (err) {
       setSuccessMsg("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    }
+    setLoading(false);
+  };
+
+  const handleSubmitChangePassword = async () => {
+    resetErrors2();
+    console.log(validate2(form2));
+    console.log(errors2);
+    if (!validate2(form2)) return;
+    setLoading(true);
+    try {
+      const res = await updateStudentPassword(form2);
+      setAlert({
+          open: true,
+          severity: "success",
+          message: "บันทึกสำเร็จ",
+        });
+      setOpen(false);
+    } catch (err) {
+      setAlert({
+          open: true,
+          severity: "error",
+          message: err.response?.data?.error || "บันทึกไม่สำเร็จ",
+        });
     }
     setLoading(false);
   };
@@ -274,6 +343,9 @@ function ProfileStudent() {
                 mt: 3,
               }}
             >
+              <Button variant="contained" onClick={() => setOpen(true)}>
+                แก้ไขรหัสผ่าน
+              </Button>
               {!editMode ? (
                 <Button variant="contained" onClick={handleEdit}>
                   แก้ไขข้อมูล
@@ -301,6 +373,134 @@ function ProfileStudent() {
             </Box>
           </CardContent>
         </Card>
+
+        <Dialog open={open} onClose={() => setOpen(false)}>
+          <DialogTitle>{"แก้ไขรหัสผ่าน"}</DialogTitle>
+          <DialogContent>
+            <Box
+              component="form"
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                flexWrap: "wrap",
+                gap: 4,
+                width: "100%",
+                py: 2,
+                justifyContent: "justify-between",
+                alignItems: "flex-start",
+              }}
+            >
+              <Box
+                sx={{
+                  flex: "1 1 320px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2,
+                }}
+              >
+                <TextField
+                  margin="dense"
+                  label="รหัสผ่านเก่า"
+                  type={showOldPassword ? "text" : "password"}
+                  name="oldPassword"
+                  value={form2.oldPassword}
+                  onChange={handleChangePassword}
+                  fullWidth
+                  error={!!errors2.oldPassword}
+                  helperText={errors2.oldPassword}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={handleClickShowOldPassword}
+                            edge="end"
+                          >
+                            {showOldPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                <TextField
+                  margin="dense"
+                  label="รหัสผ่านใหม่"
+                  type={showNewPassword ? "text" : "password"}
+                  name="newPassword"
+                  value={form2.newPassword}
+                  onChange={handleChangePassword}
+                  fullWidth
+                  error={!!errors2.newPassword}
+                  helperText={errors2.newPassword}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={handleClickShowNewPassword}
+                            edge="end"
+                          >
+                            {showNewPassword ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                <TextField
+                  margin="dense"
+                  label="รหัสผ่านใหม่อีกครั้ง"
+                  type={showNewPassword2 ? "text" : "password"}
+                  name="newPassword2"
+                  value={form2.newPassword2}
+                  onChange={handleChangePassword}
+                  fullWidth
+                  error={!!errors2.newPassword2}
+                  helperText={errors2.newPassword2}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={handleClickShowNewPassword2}
+                            edge="end"
+                          >
+                            {showNewPassword2 ? (
+                              <Visibility />
+                            ) : (
+                              <VisibilityOff />
+                            )}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              </Box>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpen(false)}>ยกเลิก</Button>
+            <Button onClick={handleSubmitChangePassword} variant="contained">
+              {"บันทึก"}
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <CustomAlert
+          open={alert.open}
+          onClose={() => setAlert({ ...alert, open: false })}
+          severity={alert.severity}
+          message={alert.message}
+        />
       </Box>
     </Box>
   );
