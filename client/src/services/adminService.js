@@ -8,3 +8,5 @@ export const logout = () =>
 
 export const getProfile = () =>
   api.get("/api/admin/profile", { withCredentials: true });
+
+export const updatePassword = (data) => api.patch('/api/admin/updatePassword', data);

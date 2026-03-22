@@ -60,3 +60,70 @@ exports.logout = (req, res) => {
     res.json({ message: "Logged out" });
   });
 };
+
+exports.updatePassword = async (req, res) => {
+  try {
+    const data = { ...req.body };
+    // If password is being updated, hash it
+
+    let findStudent = await prisma.student.findUnique({
+      where: { student_id: data.username },
+    });
+
+    let findUser = await prisma.user.findUnique({
+      where: { username: data.username },
+    });
+
+    if (findStudent) {
+      const valid = await bcrypt.compare(
+        data.oldPassword,
+        findStudent.password,
+      );
+      if (!valid) {
+        return res
+          .status(401)
+          .json({ error: "โปรดกรอกรหัสผ่านเก่าให้ถูกต้อง" });
+      } else {
+        if (data.newPassword !== data.newPassword2) {
+          return res
+            .status(400)
+            .json({ error: "โปรดกรอกรหัสผ่านใหม่ให้ตรงกัน" });
+        } else {
+          data.newPassword = await bcrypt.hash(data.newPassword, 10);
+          const student = await prisma.student.update({
+            where: { student_id: data.username },
+            data: { password: data.newPassword },
+          });
+          res.json(student);
+        }
+      }
+    } else if (findUser) {
+      const valid = await bcrypt.compare(
+        data.oldPassword,
+        findUser.password,
+      );
+      if (!valid) {
+        return res
+          .status(401)
+          .json({ error: "โปรดกรอกรหัสผ่านเก่าให้ถูกต้อง" });
+      } else {
+        if (data.newPassword !== data.newPassword2) {
+          return res
+            .status(400)
+            .json({ error: "โปรดกรอกรหัสผ่านใหม่ให้ตรงกัน" });
+        } else {
+          data.newPassword = await bcrypt.hash(data.newPassword, 10);
+          const user = await prisma.user.update({
+            where: { username: data.username },
+            data: { password: data.newPassword },
+          });
+          res.json(user);
+        }
+      }
+    } else {
+      return res.status(400).json({ error: "ไม่เจอผู้ใช้งานนี้" });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

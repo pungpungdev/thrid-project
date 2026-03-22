@@ -21,6 +21,7 @@ import TestPage from "./pages/TestPage";
 import NewComparePage from "./pages/newComparePage";
 import NewSummaryPage from "./pages/NewSummaryPage";
 import PreviewDocumentPage from "./pages/PreviewDocument";
+import Profile from "./pages/Profile";
 
 function App() {
   const { role } = useAuth();
@@ -113,7 +114,16 @@ function App() {
             }
           />
           <Route path="/preview" element={<PreviewPage />} />
-          <Route path="/profileStudent" element={<ProfileStudent />} />
+          <Route path="/profileStudent" element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+            <ProfileStudent />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute allowedRoles={["Admin", "Teacher", "Committee"]}>
+            <Profile />
+            </ProtectedRoute>
+          } />
           <Route path="/test" element={<TestPage />} />
           <Route
             path="/previewDocument/:id"

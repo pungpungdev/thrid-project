@@ -157,6 +157,4 @@ router.delete('/:id', studentController.softDeleteStudent);
 
 router.post('/import', studentController.bulkStudents);
 
-router.patch('/updatePassword', studentController.updateStudentPassword);
-
 module.exports = router;

@@ -86,4 +86,6 @@ router.get("/profile", adminController.authenticate, (req, res) => {
   res.json({ user: req.session.user });
 });
 
+router.patch("/updatePassword", adminController.updatePassword);
+
 module.exports = router;

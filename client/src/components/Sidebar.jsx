@@ -96,6 +96,14 @@ function Sidebar() {
             <ListItemText primary="ข้อมูลส่วนตัว" />
           </ListItem>
         )}
+        {role !== "Student" && (
+          <ListItem button component={Link} to="/profile">
+            <ListItemIcon sx={{ color: "#fff" }}>
+              <AssessmentIcon />
+            </ListItemIcon>
+            <ListItemText primary="ข้อมูลส่วนตัว" />
+          </ListItem>
+        )}
         {role === "Admin" && (
           <>
             <ListItem button onClick={handleAdminClick}>

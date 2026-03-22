@@ -24,18 +24,15 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 import CustomAlert from "../components/CustomAlert";
-import {
-  getStudent,
-  updateStudent,
-} from "../services/studentService";
+import { getUser, updateUser } from "../services/userService";
 import { useValidation } from "../hooks/useValidation";
 import { getFaculties } from "../services/facultyService";
 import { getMajorsByFacultyId } from "../services/majorService";
-import {updatePassword} from "../services/adminService"
+import { updatePassword } from "../services/adminService";
 
-function ProfileStudent() {
+function Profile() {
   const { user, role } = useAuth();
-  const [student, setStudent] = useState(null);
+  const [user2, setUser] = useState(null);
   const [faculties, setFaculties] = useState([]);
   const [majors, setMajors] = useState([]);
   const [editMode, setEditMode] = useState(false);
@@ -59,10 +56,10 @@ function ProfileStudent() {
     resetErrors: resetErrors2,
   } = useValidation(requiredFields2);
 
-  const fetchStudent = async () => {
-    const res = await getStudent(user.id);
-    console.log("Fetched student:", res.data);
-    setStudent(res.data);
+  const fetchUser = async () => {
+    const res = await getUser(user.id);
+    console.log("Fetched user2:", res.data);
+    setUser(res.data);
     setForm(res.data);
     setForm2({
       username: user.username,
@@ -107,20 +104,20 @@ function ProfileStudent() {
     setShowNewPassword2(!showNewPassword2);
 
   useEffect(() => {
-    if (role === "Student" && user?.id) {
-      fetchStudent();
+    if (role !== "Student" && user?.id) {
+      fetchUser();
     }
   }, []);
 
   const handleEdit = () => {
     setEditMode(true);
-    setForm(student);
+    setForm(user2);
     setSuccessMsg("");
   };
 
   const handleCancel = () => {
     setEditMode(false);
-    setForm(student);
+    setForm(user2);
     setSuccessMsg("");
   };
 
@@ -131,8 +128,8 @@ function ProfileStudent() {
     if (!validate(form)) return;
     setLoading(true);
     try {
-      const res = await updateStudent(student.id, form);
-      setStudent(res.data);
+      const res = await updateUser(user2.id, form);
+      setUser(res.data);
       setEditMode(false);
       setSuccessMsg("บันทึกข้อมูลสำเร็จ!");
     } catch (err) {
@@ -150,22 +147,22 @@ function ProfileStudent() {
     try {
       const res = await updatePassword(form2);
       setAlert({
-          open: true,
-          severity: "success",
-          message: "บันทึกสำเร็จ",
-        });
+        open: true,
+        severity: "success",
+        message: "บันทึกสำเร็จ",
+      });
       setOpen(false);
     } catch (err) {
       setAlert({
-          open: true,
-          severity: "error",
-          message: err.response?.data?.error || "บันทึกไม่สำเร็จ",
-        });
+        open: true,
+        severity: "error",
+        message: err.response?.data?.error || "บันทึกไม่สำเร็จ",
+      });
     }
     setLoading(false);
   };
 
-  if (!student) {
+  if (!user2) {
     return (
       <Box sx={{ display: "flex" }}>
         <Sidebar />
@@ -194,9 +191,9 @@ function ProfileStudent() {
                 mb: 2,
               }}
             >
-              {student.profile_img ? (
+              {user2.profile_img ? (
                 <img
-                  src={student.profile_img}
+                  src={user2.profile_img}
                   alt="profile"
                   style={{
                     width: 80,
@@ -209,15 +206,14 @@ function ProfileStudent() {
                 />
               ) : (
                 <Avatar sx={{ width: 80, height: 80, mb: 2 }}>
-                  {student.firstname_th?.charAt(0)}
+                  {user2.firstname?.charAt(0)}
                 </Avatar>
               )}
               <Typography variant="h5" sx={{ mb: 1 }}>
-                {student.title_th ? "นาย" : "นางสาว"} {student.firstname_th}{" "}
-                {student.lastname_th}
+                {user2.firstname} {user2.lastname}
               </Typography>
               <Typography color="text.secondary" sx={{ mb: 1 }}>
-                รหัสนักศึกษา: {student.student_id}
+                username: {user2.username}
               </Typography>
             </Box>
             <Divider sx={{ mb: 2 }} />
@@ -286,7 +282,7 @@ function ProfileStudent() {
               />
               <TextField
                 label="สถานะ"
-                value={student.actives ? "กำลังศึกษา" : "ไม่ใช้งาน"}
+                value={user2.actives ? "กำลังศึกษา" : "ไม่ใช้งาน"}
                 disabled
                 fullWidth
               /> */}
@@ -506,4 +502,4 @@ function ProfileStudent() {
   );
 }
 
-export default ProfileStudent;
+export default Profile;
